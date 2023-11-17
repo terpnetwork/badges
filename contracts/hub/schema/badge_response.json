@@ -1,28 +1,55 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "NftInfoResponse",
+  "title": "BadgeResponse",
   "type": "object",
   "required": [
-    "extension"
+    "current_supply",
+    "id",
+    "manager",
+    "metadata",
+    "rule",
+    "transferrable"
   ],
   "properties": {
-    "extension": {
-      "description": "You can add any custom metadata here when you extend cw721-base",
-      "allOf": [
-        {
-          "$ref": "#/definitions/Metadata"
-        }
-      ]
+    "current_supply": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0.0
     },
-    "token_uri": {
-      "description": "Universal resource identifier for this NFT Should point to a JSON file that conforms to the ERC721 Metadata JSON Schema",
+    "expiry": {
       "type": [
-        "string",
+        "integer",
         "null"
-      ]
+      ],
+      "format": "uint64",
+      "minimum": 0.0
+    },
+    "id": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0.0
+    },
+    "manager": {
+      "type": "string"
+    },
+    "max_supply": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint64",
+      "minimum": 0.0
+    },
+    "metadata": {
+      "$ref": "#/definitions/Metadata"
+    },
+    "rule": {
+      "$ref": "#/definitions/MintRule"
+    },
+    "transferrable": {
+      "type": "boolean"
     }
   },
-  "additionalProperties": false,
   "definitions": {
     "Metadata": {
       "description": "OpenSea metadata standard, used by Stargaze marketplace. See [this link](https://docs.opensea.io/docs/metadata-standards) for details.",
@@ -96,6 +123,43 @@
         }
       },
       "additionalProperties": false
+    },
+    "MintRule": {
+      "oneOf": [
+        {
+          "description": "Badges can be minted by a designated minter account.\n\nThe minter can either be a human doing the minting manually, or a smart contract that implements custom minting rules.",
+          "type": "object",
+          "required": [
+            "by_minter"
+          ],
+          "properties": {
+            "by_minter": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Badges can be minted upon the the signature signed by a designated private key. Provide the associated public key in hex encoding.\n\nThis key can be reused as many time as possible for minting, as long as the badge's deadline and max supply have not been reached.",
+          "type": "object",
+          "required": [
+            "by_key"
+          ],
+          "properties": {
+            "by_key": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Similar to the `ByKey` rule, but there are multiple pubkeys, each can only be used once.\n\nTo add a pubkey, use the `add_key` execute method. Keys can only be added before the minting deadline and max supply haven't been reached.\n\nOnce either the minting deadline or the max supply is reached, anyone can invoke the `clear_keys` method to remove unused keys from the contract storage, thereby reducing the size of the chain's state.",
+          "type": "string",
+          "enum": [
+            "by_keys"
+          ]
+        }
+      ]
     },
     "Trait": {
       "description": "An attribute of the token as defined by the [OpenSea metadata standard](https://docs.opensea.io/docs/metadata-standards#attributes).",

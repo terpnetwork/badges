@@ -1,18 +1,17 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "ContractInfoResponse",
+  "title": "KeyResponse",
   "type": "object",
   "required": [
-    "name",
-    "symbol"
+    "key",
+    "whitelisted"
   ],
   "properties": {
-    "name": {
+    "key": {
       "type": "string"
     },
-    "symbol": {
-      "type": "string"
+    "whitelisted": {
+      "type": "boolean"
     }
-  },
-  "additionalProperties": false
+  }
 }

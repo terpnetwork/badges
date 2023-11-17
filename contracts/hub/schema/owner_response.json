@@ -1,18 +1,17 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "ContractInfoResponse",
+  "title": "OwnerResponse",
   "type": "object",
   "required": [
-    "name",
-    "symbol"
+    "claimed",
+    "user"
   ],
   "properties": {
-    "name": {
-      "type": "string"
+    "claimed": {
+      "type": "boolean"
     },
-    "symbol": {
+    "user": {
       "type": "string"
     }
-  },
-  "additionalProperties": false
+  }
 }

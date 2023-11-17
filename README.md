@@ -1,8 +1,5 @@
 # Badges
 
-## TODO
-- `contracts/nft/src/contract:93`: fix query to contract addr `&minter.minter` so that the trait bound is satisfied.
-
 Badges is an NFT protocol that allows anyone to permissionlessly create digital badges, as rewards for participants of events, or people who achieve certain accomplishments.
 
 ## Overview

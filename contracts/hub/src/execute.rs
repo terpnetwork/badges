@@ -295,7 +295,6 @@ pub fn mint_by_key(
                 // NOTE: it's possible to avoid cloning and save a liiiittle bit of gas here, simply
                 // by moving this `add_message` after the one `add_attribute` that uses `owner`.
                 // however this makes the code uglier so i don't want to do it.
-                // Stargaze has free gas price anyways (for now at least)
                 owner: owner.clone(),
                 token_uri: None,
                 extension: None::<Empty>,
