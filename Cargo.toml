@@ -1,35 +1,35 @@
 [workspace]
-members = ["crates/*"]
+members = [
+    "contracts/*",
+    "packages/*",
+    ]
 
 [workspace.package]
-version    = "1.2.0"
-authors    = ["larry <gm@larry.engineer>"]
+version    = "0.1.0"
+authors    = ["A Hardnett <returniflost@skiff.com>"]
 edition    = "2021"
-homepage   = "https://badges.fun"
-repository = "https://github.com/steak-enjoyers/badges"
+homepage   = "https://dash.terp.network/w/badges"
+repository = "https://github.com/terpnetwork/badges"
 license    = "GPL-3.0-or-later"
-keywords   = ["nft", "cosmos", "cosmwasm", "stargaze"]
+keywords   = ["nft", "cosmos", "cosmwasm", "terpnetwork"]
 
 [workspace.dependencies]
-cosmwasm-schema = "1.1"
-cosmwasm-std    = "1.1"
-cw2             = "0.16"
-cw721           = "0.16"
-cw721-base      = "0.16"
+cosmwasm-schema = "1.2.1"
+cosmwasm-std    = "1.2.1"
+cw2             = "1.1.0"
+cw721           = "0.18"
+cw721-base      = "0.18"
 cw-item-set     = { version = "0.7", default-features = false, features = ["iterator"] }
 cw-storage-plus = "1.0"
 # we can't use cw-utils v1.0 because sg1 still uses 0.16
-cw-utils        = "0.16"
+cw-utils        = "1.0.1"
 hex             = "0.4"
 schemars        = "0.8"
 serde           = { version = "1.0", default-features = false }
-sg1             = "0.21"
-sg721           = "0.21"
-sg721-base      = "0.21"
-sg-metadata     = "0.21"
-sg-std          = "0.21"
 sha2            = "0.10"
 thiserror       = "1"
+cw-ownable           = "0.5.1"
+url                  = "2.2.2"
 
 [profile.release]
 codegen-units    = 1

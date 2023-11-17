@@ -1,5 +1,8 @@
 # Badges
 
+## TODO
+- `contracts/nft/src/contract:93`: fix query to contract addr `&minter.minter` so that the trait bound is satisfied.
+
 Badges is an NFT protocol that allows anyone to permissionlessly create digital badges, as rewards for participants of events, or people who achieve certain accomplishments.
 
 ## Overview
@@ -9,11 +12,11 @@ Badges is an NFT protocol that allows anyone to permissionlessly create digital 
 The Badges project consists of two smart contracts:
 
 - `badge-hub` is where users create, edit, or mint new badges
-- `badge-nft` is the non-fungible token that implements the [SG-721](https://crates.io/crates/sg721) interface, compatible with the [Stargaze marketplace](https://app.stargaze.zone/)
+- `badge-nft` is the non-fungible token that implements the `BADGE-721` interface.
 
 ### Minting
 
-Creation of new badges is permissionless. When creating a new badge, a fee is charged based on the amount of storage space it consumes. The fee rate, defined as ustars per byte, can be set by L1 governance.
+Creation of new badges is permissionless. When creating a new badge, a fee is charged based on the amount of storage space it consumes. The fee rate, defined as uthiol per byte.
 
 Each badge defines its own minting rule. There are three such rules to be chosen from:
 
@@ -43,19 +46,19 @@ The Hub contract implements two methods, `purge_keys` and `purge_owners`, which 
 
 ## Deployment
 
-### stargaze-1
+### morocco-1
 
 | Contract  | Address                                                                                                                                                                               |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Badge Hub | [`stars13unm9tgtwq683wplupjlgw39nghm7xva7tmu7m29tmpxxnkhpkcq4gf3p4`](https://www.mintscan.io/stargaze/wasm/contract/stars13unm9tgtwq683wplupjlgw39nghm7xva7tmu7m29tmpxxnkhpkcq4gf3p4) |
-| Badge NFT | [`stars1z5qcmx9frn2y92cjy3k62gzylkezkphdwrx3675mvug3fd9l26fshdd85t`](https://www.mintscan.io/stargaze/wasm/contract/stars1z5qcmx9frn2y92cjy3k62gzylkezkphdwrx3675mvug3fd9l26fshdd85t) |
+| Badge Hub | [`TBD`]() |
+| Badge NFT | [`TBD`]() |
 
-### elgafar-1
+### 90u-2
 
 | Contract  | Address                                                            |
 | --------- | ------------------------------------------------------------------ |
-| Badge Hub | `stars1dacun0xn7z73qzdcmq27q3xn6xuprg8e2ugj364784al2v27tklqynhuqa` |
-| Badge NFT | `stars1vlw4y54dyzt3zg7phj8yey9fg4zj49czknssngwmgrnwymyktztstalg7t` |
+| Badge Hub | `TBD` |
+| Badge NFT | `TBD` |
 
 ## License
 
