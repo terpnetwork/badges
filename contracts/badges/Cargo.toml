@@ -1,0 +1,23 @@
+[package]
+name        = "badges"
+description = "Badges allows anyone to create digital badges, as rewards for participantion in events or achieving certain accomplishments"
+version     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+repository  = { workspace = true }
+license     = { workspace = true }
+keywords    = { workspace = true }
+
+[lib]
+doctest = false
+
+[dependencies]
+cosmwasm-std = { workspace = true }
+cw721        = { workspace = true }
+cw721-base   = { workspace = true, features = ["library"] }
+schemars     = { workspace = true }
+serde        = { workspace = true, features = ["derive"] }
+badge721-base   = { path = "../badge721-base" }
+badge721        = { path = "../../packages/badge721" }
+cw-metadata     = { path = "../../packages/cw-metadata" }

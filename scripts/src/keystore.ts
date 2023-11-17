@@ -21,8 +21,8 @@ export async function create(
   }
 
   const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-    // for this project we only work with Stargaze, so we hardcode the prefix as `stars` here
-    prefix: "stars",
+    // for this project we only work with Terp Network, so we hardcode the prefix as `terp` here
+    prefix: "terp",
     hdPaths: [stringToPath(`m/44'/${coinType}'/0'/0/0`)],
   });
 
