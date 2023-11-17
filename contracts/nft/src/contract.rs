@@ -7,7 +7,7 @@ use cw_metadata::{Metadata, Trait};
 use badge_std::Response;
 
 use badges::hub::BadgeResponse;
-use badges::nft::{AllNftInfoResponse, Extension, InstantiateMsg, NftInfoResponse};
+use badges::nft::{AllNftInfoResponse, Extension, InstantiateMsg, NftInfoResponse, MinterResponse};
 
 use crate::state::API_URL;
 
@@ -91,14 +91,14 @@ impl<'a> NftContract<'a> {
     /// a separate copy in each token's extension. This function queries the Hub contract for the
     /// metadata of a given token id.
     fn query_badge(&self, deps: Deps, id: u64) -> StdResult<BadgeResponse> {
-        let minter = self.parent.parent.minter(deps)?;
+        let minter: MinterResponse = self.parent.parent.minter(deps)?;
         deps.querier.query_wasm_smart(
-            &minter.minter,
+            &minter.minter.unwrap_or_default(),
             &badges::hub::QueryMsg::Badge {
                 id,
             },
         )
-    }
+    }    
 }
 
 /// URL of an API serving the metadata of the NFT.

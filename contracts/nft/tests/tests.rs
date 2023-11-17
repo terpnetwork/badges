@@ -97,9 +97,9 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
             deps.as_mut(),
             mock_env(),
             mock_info("hub", &[]),
-            MintMsg::<Extension> {
-                token_id: "69|420".to_string(),
-                owner: "jake".to_string(),
+            badge721_base::msg::NftParams::NftData {
+                token_id: "420|69".to_string(),
+                owner: "pumpkin".to_string(),
                 token_uri: None,
                 extension: None,
             },
@@ -112,7 +112,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
             deps.as_mut(),
             mock_env(),
             mock_info("hub", &[]),
-            MintMsg::<Extension> {
+             badge721_base::msg::NftParams::NftData {
                 token_id: "420|69".to_string(),
                 owner: "pumpkin".to_string(),
                 token_uri: None,
@@ -180,7 +180,7 @@ fn instantiating() {
     let contract = NftContract::default();
 
     let minter = contract.parent.parent.minter(deps.as_ref()).unwrap();
-    assert_eq!(minter.minter, "hub");
+    assert_eq!(minter.minter, Some("hub".to_string()));
 
     let info = contract.parent.parent.contract_info(deps.as_ref()).unwrap();
     assert_eq!(info.name, "Badges");
