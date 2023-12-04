@@ -19,5 +19,5 @@ cw721-base   = { workspace = true, features = ["library"] }
 schemars     = { workspace = true }
 serde        = { workspace = true, features = ["derive"] }
 badge721-base   = { path = "../badge721-base" }
-badge721        = { path = "../../packages/badge721" }
-cw-metadata     = { path = "../../packages/cw-metadata" }
+badge721        = { path = "../badge721" }
+cw-metadata     = { path = "../cw-metadata" }
