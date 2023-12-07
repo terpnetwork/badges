@@ -5,9 +5,9 @@ use badge_nft::entry;
 use cosmwasm_std::testing::{mock_env, mock_info, MockApi, MockStorage};
 use cosmwasm_std::{Addr, Empty, OwnedDeps, StdError};
 use cw721::{AllNftInfoResponse, Cw721Query};
-use badge721_base::msg::ExecuteMsg::Mint;
-use badge721::CollectionInfo;
-use cw_metadata::{Metadata, Trait};
+// use terp721_base::msg::ExecuteMsg::Mint;
+use terp721::CollectionInfo;
+use terp_metadata::{Metadata, Trait};
 
 use badge_nft::contract::{parse_token_id, prepend_traits, NftContract};
 use badges::nft::{ExecuteMsg, Extension, InstantiateMsg};
@@ -85,7 +85,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
                     external_link: Some("https://larry.engineer/".to_string()),
                     explicit_content: None,
                     start_trading_time: None,
-                    royalty_info: None,
+                    residual_info: None,
                 },
             },
         )
@@ -97,7 +97,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
             deps.as_mut(),
             mock_env(),
             mock_info("hub", &[]),
-            badge721_base::msg::NftParams::NftData {
+            terp721_base::msg::NftParams::NftData {
                 token_id: "420|69".to_string(),
                 owner: "pumpkin".to_string(),
                 token_uri: None,
@@ -112,7 +112,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
             deps.as_mut(),
             mock_env(),
             mock_info("hub", &[]),
-             badge721_base::msg::NftParams::NftData {
+             terp721_base::msg::NftParams::NftData {
                 token_id: "420|69".to_string(),
                 owner: "pumpkin".to_string(),
                 token_uri: None,
@@ -188,7 +188,7 @@ fn instantiating() {
 
     let info = contract.parent.query_collection_info(deps.as_ref()).unwrap();
     assert_eq!(info.creator, "larry");
-    assert!(info.royalty_info.is_none());
+    assert!(info.residual_info.is_none());
 
     let owner = contract
         .parent

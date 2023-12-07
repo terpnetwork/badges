@@ -1,8 +1,8 @@
 use cosmwasm_std::testing::{mock_dependencies, MockApi, MockQuerier, MockStorage};
 use cosmwasm_std::{attr, to_json_binary, Addr, Empty, OwnedDeps, StdResult, Storage, SubMsg, WasmMsg};
 use k256::ecdsa::{SigningKey, VerifyingKey};
-use badge721_base::msg::ExecuteMsg::Mint;
-use cw_metadata::Metadata;
+use terp721_base::msg::ExecuteMsg::Mint;
+use terp_metadata::Metadata;
 
 use badge_hub::error::ContractError;
 use badge_hub::helpers::{message, token_id};
@@ -151,7 +151,7 @@ fn minting_by_minter() {
                     let serial = 98 + (idx + 1) as u64;
                     SubMsg::new(WasmMsg::Execute {
                         contract_addr: "nft".to_string(),
-                        msg: to_json_binary(&badge721::ExecuteMsg::<_, Empty>::Mint {
+                        msg: to_json_binary(&terp721::ExecuteMsg::<_, Empty>::Mint {
                             token_id: token_id(1, serial),
                             owner: owner.to_string(),
                             token_uri: None,
@@ -252,7 +252,7 @@ fn minting_by_key() {
             res.messages,
             vec![SubMsg::new(WasmMsg::Execute {
                 contract_addr: "nft".to_string(),
-                msg: to_json_binary(&badge721::ExecuteMsg::<_, Empty>::Mint {
+                msg: to_json_binary(&terp721::ExecuteMsg::<_, Empty>::Mint {
                     token_id: "2|99".to_string(),
                     owner: "larry".to_string(),
                     token_uri: None,
@@ -398,7 +398,7 @@ fn minting_by_keys() {
             res.messages,
             vec![SubMsg::new(WasmMsg::Execute {
                 contract_addr: "nft".to_string(),
-                msg: to_json_binary(&badge721::ExecuteMsg::<_, Empty>::Mint {
+                msg: to_json_binary(&terp721::ExecuteMsg::<_, Empty>::Mint {
                     token_id: "3|99".to_string(),
                     owner: "larry".to_string(),
                     token_uri: None,

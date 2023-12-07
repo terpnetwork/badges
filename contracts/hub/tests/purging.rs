@@ -1,6 +1,6 @@
 use cosmwasm_std::testing::{mock_dependencies,  MockApi, MockQuerier, MockStorage};
 use cosmwasm_std::{attr, Addr, Empty, OwnedDeps};
-use cw_metadata::Metadata;
+use terp_metadata::Metadata;
 
 use badge_hub::error::ContractError;
 use badge_hub::state::*;

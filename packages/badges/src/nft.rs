@@ -1,7 +1,7 @@
 use cosmwasm_std::Empty;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use cw_metadata::Metadata;
+use terp_metadata::Metadata;
 
 pub type Extension = Option<Empty>;
 
@@ -13,12 +13,12 @@ pub struct InstantiateMsg {
     /// The full URL will be `${api_url}?id=${id}&serial=${serial}`
     pub api_url: String,
     /// SG-721 collection info
-    pub collection_info: badge721::CollectionInfo<badge721::RoyaltyInfoResponse>,
+    pub collection_info: terp721::CollectionInfo<terp721::ResidualInfoResponse>,
 }
 
 // message types
-pub type ExecuteMsg = badge721::ExecuteMsg<Extension, Empty>;
-pub type QueryMsg = badge721_base::msg::QueryMsg;
+pub type ExecuteMsg = terp721::ExecuteMsg<Extension, Empty>;
+pub type QueryMsg = terp721_base::msg::QueryMsg;
 
 // response types
 pub type ContractInfoResponse = cw721::ContractInfoResponse;
@@ -31,4 +31,4 @@ pub type OperatorsResponse = cw721::OperatorsResponse;
 pub type NftInfoResponse = cw721::NftInfoResponse<Metadata>;
 pub type AllNftInfoResponse = cw721::AllNftInfoResponse<Metadata>;
 pub type MinterResponse = cw721_base::MinterResponse;
-pub type CollectionInfoResponse = badge721_base::msg::CollectionInfoResponse;
+pub type CollectionInfoResponse = terp721_base::msg::CollectionInfoResponse;

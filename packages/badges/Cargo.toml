@@ -18,6 +18,6 @@ cw721        = { workspace = true }
 cw721-base   = { workspace = true, features = ["library"] }
 schemars     = { workspace = true }
 serde        = { workspace = true, features = ["derive"] }
-badge721-base   = { path = "../badge721-base" }
-badge721        = { path = "../badge721" }
-cw-metadata     = { path = "../cw-metadata" }
+terp721-base   = { workspace = true }
+terp721        = { workspace = true }
+terp-metadata   = { workspace = true }

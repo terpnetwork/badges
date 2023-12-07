@@ -1,5 +1,5 @@
 use cosmwasm_std::{DepsMut, StdResult, Storage};
-use badge_std::Response;
+use terp_sdk::Response;
 
 use badges::MintRule;
 

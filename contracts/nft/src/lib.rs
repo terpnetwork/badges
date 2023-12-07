@@ -4,11 +4,11 @@ pub mod state;
 
 #[cfg(not(feature = "library"))]
 pub mod entry {
-    use badge_std::Response;
+    use terp_sdk::Response;
     use cosmwasm_std::{
-        entry_point, to_json_binary, Binary, Deps, DepsMut, Empty, Env, MessageInfo, StdResult,
+        entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, StdResult,
     };
-    use badge721_base::ContractError;
+    use terp721_base::ContractError;
     use badges::nft::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
     use crate::contract::NftContract;

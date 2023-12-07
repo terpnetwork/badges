@@ -3,8 +3,8 @@ use std::str::FromStr;
 
 use cosmwasm_std::{Deps, DepsMut, Env, MessageInfo, StdError, StdResult, Storage};
 use cw721::Cw721Query;
-use cw_metadata::{Metadata, Trait};
-use badge_std::Response;
+use terp_metadata::{Metadata, Trait};
+use terp_sdk::Response;
 
 use badges::hub::BadgeResponse;
 use badges::nft::{AllNftInfoResponse, Extension, InstantiateMsg, NftInfoResponse, MinterResponse};
@@ -16,7 +16,7 @@ pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Default)]
 pub struct NftContract<'a> {
-    pub parent: badge721_base::Badge721Contract<'a, Extension>,
+    pub parent: terp721_base::Terp721Contract<'a, Extension>,
 }
 
 impl<'a> NftContract<'a> {
@@ -26,7 +26,7 @@ impl<'a> NftContract<'a> {
         env: Env,
         info: MessageInfo,
         msg: InstantiateMsg,
-    ) -> Result<Response, badge721_base::ContractError> {
+    ) -> Result<Response, terp721_base::ContractError> {
         cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
         API_URL.save(deps.storage, &msg.api_url)?;
@@ -35,7 +35,7 @@ impl<'a> NftContract<'a> {
             deps,
             env,
             info,
-            badge721::InstantiateMsg {
+            terp721::InstantiateMsg {
                 name: "Badges".to_string(),
                 symbol: "B".to_string(),
                 minter: msg.hub,

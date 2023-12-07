@@ -2,8 +2,8 @@ use std::collections::BTreeSet;
 
 use cosmwasm_std::{to_json_binary, Addr, DepsMut, Empty, Env, MessageInfo, StdResult, WasmMsg};
 // use cw721_base::msg::ExecuteMsg::Mint;
-use cw_metadata::Metadata;
-use badge_std::Response;
+use terp_metadata::Metadata;
+use terp_sdk::Response;
 
 use badges::{Badge, FeeRate, MintRule};
 
@@ -250,7 +250,7 @@ pub fn mint_by_minter(
             let serial = start_serial + (idx as u64);
             Ok(WasmMsg::Execute {
                 contract_addr: nft_addr.to_string(),
-                msg: to_json_binary(&badge721::ExecuteMsg::<_, Empty>::Mint {
+                msg: to_json_binary(&terp721::ExecuteMsg::<_, Empty>::Mint {
                     token_id: token_id(id, serial),
                     owner,
                     token_uri: None,
@@ -290,7 +290,7 @@ pub fn mint_by_key(
     Ok(Response::new()
         .add_message(WasmMsg::Execute {
             contract_addr: nft_addr.to_string(),
-            msg: to_json_binary(&badge721::ExecuteMsg::<_, Empty>::Mint {
+            msg: to_json_binary(&terp721::ExecuteMsg::<_, Empty>::Mint {
                 token_id: token_id(id, badge.current_supply),
                 // NOTE: it's possible to avoid cloning and save a liiiittle bit of gas here, simply
                 // by moving this `add_message` after the one `add_attribute` that uses `owner`.
@@ -331,7 +331,7 @@ pub fn mint_by_keys(
     Ok(Response::new()
         .add_message(WasmMsg::Execute {
             contract_addr: nft_addr.to_string(),
-            msg: to_json_binary(&badge721::ExecuteMsg::<_, Empty>::Mint {
+            msg: to_json_binary(&terp721::ExecuteMsg::<_, Empty>::Mint {
                 token_id: token_id(id, badge.current_supply),
                 owner: owner.clone(),
                 token_uri: None,

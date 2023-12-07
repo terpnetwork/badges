@@ -1,6 +1,6 @@
 use cosmwasm_std::{Decimal, DepsMut, StdResult, Storage};
 use cw_storage_plus::Item;
-use badge_std::Response;
+use terp_sdk::Response;
 
 use badges::FeeRate;
 
