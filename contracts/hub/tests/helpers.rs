@@ -1,7 +1,7 @@
 use cosmwasm_std::testing::mock_dependencies;
 use cosmwasm_std::Addr;
 use k256::ecdsa::VerifyingKey;
-use cw_metadata::Metadata;
+use terp_metadata::Metadata;
 
 use badge_hub::error::ContractError;
 use badge_hub::helpers::*;

@@ -17,7 +17,7 @@ doctest    = false
 library = []
 
 [dependencies]
-badges          = { path = "../badges" }
+badges          = { path = "../../packages/badges" }
 cosmwasm-schema = { workspace = true }
 cosmwasm-std    = { workspace = true }
 cw-item-set     = { workspace = true }
@@ -27,11 +27,11 @@ cw2             = { workspace = true }
 cw721-base      = { workspace = true, features = ["library"] }
 hex             = { workspace = true }
 serde           = { workspace = true }
-badge-fee       = { path = "../../packages/badge-fee" }
-badge721        = { path = "../../packages/badge721" }
-badge721-base   = { path = "../badge721-base" }
-cw-metadata     = { path = "../../packages/cw-metadata" }
-badge-std       = { path = "../../packages/badge-std" }
+terp-fee        = { workspace = true }
+terp721         = { workspace = true }
+terp721-base    = { workspace = true }
+terp-metadata   = { workspace = true }
+terp-sdk        = { workspace = true }
 sha2            = { workspace = true }
 thiserror       = { workspace = true }
 

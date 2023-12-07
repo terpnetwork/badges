@@ -2,7 +2,7 @@ use std::collections::BTreeSet;
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use cw_metadata::Metadata;
+use terp_metadata::Metadata;
 
 use crate::{Badge, FeeRate, MintRule};
 

@@ -1,7 +1,7 @@
 use cosmwasm_std::Addr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use cw_metadata::Metadata;
+use terp_metadata::Metadata;
 
 use crate::MintRule;
 

@@ -1,7 +1,7 @@
 use cosmwasm_std::{
     entry_point, to_json_binary, Binary, Deps, DepsMut, Empty, Env, MessageInfo, StdResult,
 };
-use badge_std::Response;
+use terp_sdk::Response;
 
 use badges::{
     hub::{ExecuteMsg, InstantiateMsg, QueryMsg, SudoMsg},

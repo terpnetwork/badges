@@ -14,7 +14,7 @@ pub enum ContractError {
     ParseReply(#[from] cw_utils::ParseReplyError),
 
     #[error(transparent)]
-    Fee(#[from] badge_fee::FeeError),
+    Fee(#[from] terp_fee::FeeError),
 
     #[error(transparent)]
     FromHex(#[from] hex::FromHexError),

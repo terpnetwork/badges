@@ -1,5 +1,5 @@
 use cosmwasm_std::{to_json_binary, MessageInfo, Storage, Uint128, Decimal};
-use badge_std::Response;
+use terp_sdk::Response;
 
 use crate::{error::ContractError, state::DEVELOPER};
 
@@ -27,7 +27,7 @@ pub fn handle_fee<T: serde::Serialize>(
 
     if !fee.is_zero() {
         let developer = DEVELOPER.load(store)?;
-        badge_fee::checked_fair_burn(info, fee.u128(), Some(developer), &mut res)?;
+        terp_fee::checked_fair_burn(info, fee.u128(), Some(developer), &mut res)?;
     }
 
     Ok(res)

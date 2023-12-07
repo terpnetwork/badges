@@ -6,9 +6,9 @@ use cosmwasm_std::{
 };
 use cw_utils::PaymentError;
 use k256::ecdsa::VerifyingKey;
-use badge_fee::FeeError;
-use cw_metadata::{Metadata, Trait};
-use badge_std::{ Response, NATIVE_FEE_DENOM, create_fund_community_pool_msg};
+use terp_fee::FeeError;
+use terp_metadata::{Metadata, Trait};
+use terp_sdk::{ Response, NATIVE_FEE_DENOM, create_fund_community_pool_msg};
 
 use badge_hub::error::ContractError;
 use badge_hub::{execute, query};
@@ -36,7 +36,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, MockQuerier, Empty> {
     deps
 }
 
-fn assert_correct_badge_fee_output(res: &Response, fee_amount: u128) {
+fn assert_correct_terp_fee_output(res: &Response, fee_amount: u128) {
     let dev_amount = fee_amount * 10 / 100;
     let burn_amount = fee_amount * 40 / 100;
     let dist_amount = fee_amount - dev_amount - burn_amount;
@@ -116,7 +116,7 @@ fn badge_creation_fee() {
     // try create with correct amount and denom, should succeed
     {
         let res = create(fee_amount, NATIVE_FEE_DENOM).unwrap();
-        assert_correct_badge_fee_output(&res, fee_amount);
+        assert_correct_terp_fee_output(&res, fee_amount);
     }
 }
 
@@ -210,7 +210,7 @@ fn badge_editing_fee() {
     // send sufficient fee, should succeed
     {
         let res = edit(deps.as_mut(), &new_metadata, fee_amount).unwrap();
-        assert_correct_badge_fee_output(&res, fee_amount);
+        assert_correct_terp_fee_output(&res, fee_amount);
     }
 }
 
@@ -271,7 +271,7 @@ fn key_adding_fee() {
     // sending sufficient fee
     {
         let res = add(deps.as_mut(), &mock_keys_set, fee_amount).unwrap();
-        assert_correct_badge_fee_output(&res, fee_amount);
+        assert_correct_terp_fee_output(&res, fee_amount);
 
         let res = query::key(deps.as_ref(), 1, &mock_keys[7]);
         assert!(res.whitelisted);
