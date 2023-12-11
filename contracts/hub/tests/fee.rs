@@ -10,14 +10,14 @@ use terp_fee::FeeError;
 use terp_metadata::{Metadata, Trait};
 use terp_sdk::{ Response, NATIVE_FEE_DENOM, create_fund_community_pool_msg};
 
-use badge_hub::error::ContractError;
-use badge_hub::{execute, query};
-use badge_hub::state::*;
-use badges::{Badge, MintRule, FeeRate};
+use tea_hub::error::ContractError;
+use tea_hub::{execute, query};
+use tea_hub::state::*;
+use tea::{Tea, MintRule, FeeRate};
 
 mod utils;
 
-// 10 ustars per bytes
+// 10 uthiol per bytes
 fn mock_fee_rate() -> FeeRate {
     FeeRate {
         metadata: Decimal::from_ratio(10u128, 1u128),
@@ -30,7 +30,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, MockQuerier, Empty> {
 
     DEVELOPER.save(deps.as_mut().storage, &Addr::unchecked("larry")).unwrap();
     NFT.save(deps.as_mut().storage, &Addr::unchecked("nft")).unwrap();
-    BADGE_COUNT.save(deps.as_mut().storage, &0).unwrap();
+    TEA_COUNT.save(deps.as_mut().storage, &0).unwrap();
     FEE_RATE.save(deps.as_mut().storage, &mock_fee_rate()).unwrap();
 
     deps
@@ -38,9 +38,8 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, MockQuerier, Empty> {
 
 fn assert_correct_terp_fee_output(res: &Response, fee_amount: u128) {
     let dev_amount = fee_amount * 10 / 100;
-    let burn_amount = fee_amount * 40 / 100;
-    let dist_amount = fee_amount - dev_amount - burn_amount;
-
+    let dist_amount = fee_amount - dev_amount ;
+ 
     assert_eq!(
         res.messages,
         vec![
@@ -48,9 +47,9 @@ fn assert_correct_terp_fee_output(res: &Response, fee_amount: u128) {
                 to_address: "larry".to_string(),
                 amount: coins(dev_amount, NATIVE_FEE_DENOM),
             }),
-            SubMsg::new(BankMsg::Burn {
-                amount: coins(burn_amount, NATIVE_FEE_DENOM),
-            }),
+            // SubMsg::new(BankMsg::Burn {
+            //     amount: coins(burn_amount, NATIVE_FEE_DENOM),
+            // }),
             SubMsg::new(create_fund_community_pool_msg(coins(dist_amount, NATIVE_FEE_DENOM)))
         ]
     );
@@ -59,16 +58,15 @@ fn assert_correct_terp_fee_output(res: &Response, fee_amount: u128) {
         vec![Event::new("fair-burn")
             .add_attribute("dev", "larry")
             .add_attribute("dev_amount", dev_amount.to_string())
-            .add_attribute("burn_amount", burn_amount.to_string())
             .add_attribute("dist_amount", dist_amount.to_string())]
     );
 }
 
 #[test]
-fn badge_creation_fee() {
+fn tea_creation_fee() {
     let mut deps = setup_test();
 
-    let mock_badge = Badge {
+    let mock_tea = Tea {
         manager: Addr::unchecked("manager"),
         metadata: Metadata::default(),
         transferrable: false,
@@ -79,15 +77,15 @@ fn badge_creation_fee() {
     };
 
     let mut create = |amount: u128, denom: &str| -> Result<Response, ContractError> {
-        execute::create_badge(
+        execute::create_tea(
             deps.as_mut(),
             utils::mock_env_at_timestamp(10000),
             mock_info("creator", &coins(amount, denom)),
-            mock_badge.clone(),
+            mock_tea.clone(),
         )
     };
 
-    let bytes = to_json_binary(&mock_badge).unwrap();
+    let bytes = to_json_binary(&mock_tea).unwrap();
     let fee_amount = (Uint128::from(bytes.len() as u128) * mock_fee_rate().metadata).u128();
 
     // try create without sending a fee, should fail
@@ -121,7 +119,7 @@ fn badge_creation_fee() {
 }
 
 #[test]
-fn badge_editing_fee() {
+fn tea_editing_fee() {
     let mut deps = setup_test();
 
     let old_metadata = Metadata {
@@ -158,7 +156,7 @@ fn badge_editing_fee() {
         ..Default::default()
     };
 
-    let mock_badge = Badge {
+    let mock_tea = Tea {
         manager: Addr::unchecked("manager"),
         metadata: old_metadata.clone(),
         transferrable: false,
@@ -168,11 +166,11 @@ fn badge_editing_fee() {
         current_supply: 0,
     };
 
-    BADGES.save(deps.as_mut().storage, 1, &mock_badge).unwrap();
+    ALL_TEA.save(deps.as_mut().storage, 1, &mock_tea).unwrap();
 
     // can't use closure here due to borrowing
     fn edit(deps: DepsMut, metadata: &Metadata, amount: u128) -> Result<Response, ContractError> {
-        execute::edit_badge(
+        execute::edit_tea(
             deps,
             mock_info("manager", &coins(amount, NATIVE_FEE_DENOM)),
             1,
@@ -187,12 +185,12 @@ fn badge_editing_fee() {
         let res = edit(deps.as_mut(), &metadata, 0).unwrap();
         assert_eq!(res.messages, vec![]);
 
-        let badge = BADGES.load(deps.as_ref().storage, 1).unwrap();
-        assert_eq!(badge.metadata, metadata);
+        let tea = ALL_TEA.load(deps.as_ref().storage, 1).unwrap();
+        assert_eq!(tea.metadata, metadata);
     }
 
-    // reset badge
-    BADGES.save(deps.as_mut().storage, 1, &mock_badge).unwrap();
+    // reset tea
+    ALL_TEA.save(deps.as_mut().storage, 1, &mock_tea).unwrap();
 
     // calculate the expected fee amount
     let old_bytes = to_json_binary(&old_metadata).unwrap().len() as u128;
@@ -218,7 +216,7 @@ fn badge_editing_fee() {
 fn key_adding_fee() {
     let mut deps = setup_test();
 
-    let mock_badge = Badge {
+    let mock_tea = Tea {
         manager: Addr::unchecked("manager"),
         metadata: Metadata::default(),
         transferrable: false,
@@ -228,7 +226,7 @@ fn key_adding_fee() {
         current_supply: 0,
     };
 
-    BADGES.save(deps.as_mut().storage, 1, &mock_badge).unwrap();
+    ALL_TEA.save(deps.as_mut().storage, 1, &mock_tea).unwrap();
 
     let mock_keys = (1..20)
         .map(|_| {

@@ -2,27 +2,27 @@ use cosmwasm_std::Addr;
 use cw_item_set::Set;
 use cw_storage_plus::{Item, Map};
 
-use badges::{Badge, FeeRate};
+use tea::{Tea, FeeRate};
 
 /// Address of the developer
 pub const DEVELOPER: Item<Addr> = Item::new("owner");
 
-/// Address of badge nft contract
+/// Address of tea nft contract
 pub const NFT: Item<Addr> = Item::new("nft");
 
-/// The fee rate, in ustars per byte, charged for storing data on-chain
+/// The fee rate, in uthiol per byte, charged for storing data on-chain
 pub const FEE_RATE: Item<FeeRate> = Item::new("fee_rate");
 
-/// Total number of badges
-pub const BADGE_COUNT: Item<u64> = Item::new("badge_count");
+/// Total number of tea
+pub const TEA_COUNT: Item<u64> = Item::new("tea_count");
 
-/// Badges, indexed by ids
-pub const BADGES: Map<u64, Badge> = Map::new("badges");
+/// All tea tokens, indexed by ids
+pub const ALL_TEA: Map<u64, Tea> = Map::new("tea");
 
-/// Pubkeys that are whitelisted to mint a badge
+/// Pubkeys that are whitelisted to mint a tea
 pub const KEYS: Set<(u64, &str)> = Set::new("keys");
 
-/// User addresses that have already claimed a badge. If a composite key {badge_id, user_addr}
+/// User addresses that have already claimed a tea. If a composite key {tea_id, user_addr}
 /// exists in the map, then this user has already claimed.
 ///
 /// Note that we don't verify the addresses here. The verifification is done by the NFT contract.

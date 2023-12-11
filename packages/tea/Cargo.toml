@@ -1,6 +1,6 @@
 [package]
-name        = "badges"
-description = "Badges allows anyone to create digital badges, as rewards for participantion in events or achieving certain accomplishments"
+name        = "tea"
+description = "Terp Event Attendance allows anyone to create digital TEA, as rewards for participantion in events or achieving certain accomplishments"
 version     = { workspace = true }
 authors     = { workspace = true }
 edition     = { workspace = true }

@@ -11,12 +11,12 @@ helpers.suppressFetchAPIWarning();
 const args = yargs(hideBin(process.argv))
   .option("contract", {
     type: "string",
-    describe: "code id of the badges hub contract",
+    describe: "code id of the tea hub contract",
     demandOption: true,
   })
   .option("code-id", {
     type: "number",
-    describe: "code id of the badges hub contract",
+    describe: "code id of the tea hub contract",
     demandOption: true,
   })
   .option("network", {

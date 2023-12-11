@@ -3,10 +3,10 @@ use cosmwasm_std::{attr, Addr, Decimal, DepsMut, Empty, OwnedDeps};
 use terp_metadata::Metadata;
 use terp_sdk::Response;
 
-use badge_hub::error::ContractError;
-use badge_hub::state::*;
-use badge_hub::{execute, query};
-use badges::{Badge, MintRule, FeeRate};
+use tea_hub::error::ContractError;
+use tea_hub::state::*;
+use tea_hub::{execute, query};
+use tea::{Tea, MintRule, FeeRate};
 
 mod utils;
 
@@ -22,9 +22,9 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, MockQuerier, Empty> {
 
     DEVELOPER.save(deps.as_mut().storage, &Addr::unchecked("larry")).unwrap();
     NFT.save(deps.as_mut().storage, &Addr::unchecked("nft")).unwrap();
-    BADGE_COUNT.save(deps.as_mut().storage, &0).unwrap();
+    TEA_COUNT.save(deps.as_mut().storage, &0).unwrap();
 
-    // here we test the creation of badges without fees
+    // here we test the creation of tea without fees
     // fee-related logics are tested in a separate file
     FEE_RATE
         .save(
@@ -39,11 +39,11 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, MockQuerier, Empty> {
     deps
 }
 
-fn mock_badge() -> Badge {
-    Badge {
+fn mock_tea() -> Tea {
+    Tea {
         manager: Addr::unchecked("larry"),
         metadata: Metadata {
-            name: Some("first-badge".to_string()),
+            name: Some("first-tea".to_string()),
             ..Default::default()
         },
         transferrable: true,
@@ -54,42 +54,42 @@ fn mock_badge() -> Badge {
     }
 }
 
-fn create_badge(deps: DepsMut, badge: &Badge) -> Response {
-    execute::create_badge(
+fn create_tea(deps: DepsMut, tea: &Tea) -> Response {
+    execute::create_tea(
         deps,
         utils::mock_env_at_timestamp(10000),
         mock_info("creator", &[]),
-        badge.clone(),
+        tea.clone(),
     )
     .unwrap()
 }
 
 #[test]
-fn creating_unavailable_badges() {
+fn creating_unavailable_teas() {
     let mut deps = setup_test();
 
-    // cannot create a badge that's already expired
+    // cannot create a tea that's already expired
     {
-        let err = execute::create_badge(
+        let err = execute::create_tea(
             deps.as_mut(),
             utils::mock_env_at_timestamp(99999),
             mock_info("creator", &[]),
-            mock_badge(),
+            mock_tea(),
         )
         .unwrap_err();
         assert_eq!(err, ContractError::Expired);
     }
 
-    // cannot create a badge that has zero max supply
+    // cannot create a tea that has zero max supply
     {
-        let mut badge = mock_badge();
-        badge.max_supply = Some(0);
+        let mut tea = mock_tea();
+        tea.max_supply = Some(0);
 
-        let err = execute::create_badge(
+        let err = execute::create_tea(
             deps.as_mut(),
             utils::mock_env_at_timestamp(10000),
             mock_info("creator", &[]),
-            badge,
+            tea,
         )
         .unwrap_err();
         assert_eq!(err, ContractError::SoldOut);
@@ -97,15 +97,15 @@ fn creating_unavailable_badges() {
 }
 
 #[test]
-fn creating_badge() {
+fn creating_tea() {
     let mut deps = setup_test();
 
-    // create the first badge
+    // create the first tea
     {
-        let badge = Badge {
+        let tea = Tea {
             manager: Addr::unchecked("larry"),
             metadata: Metadata {
-                name: Some("first-badge".to_string()),
+                name: Some("first-tea".to_string()),
                 ..Default::default()
             },
             transferrable: true,
@@ -115,30 +115,30 @@ fn creating_badge() {
             current_supply: 0,
         };
 
-        let res = create_badge(deps.as_mut(), &badge);
+        let res = create_tea(deps.as_mut(), &tea);
         assert_eq!(res.messages, vec![]);
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/create_badge"),
+                attr("action", "tea/hub/create_tea"),
                 attr("id", "1"),
                 attr("fee", "[]"),
             ]
         );
 
         let cfg = query::config(deps.as_ref()).unwrap();
-        assert_eq!(cfg.badge_count, 1);
+        assert_eq!(cfg.tea_count, 1);
 
-        let b = query::badge(deps.as_ref(), 1).unwrap();
-        assert_eq!(b, (1, badge).into());
+        let b = query::tea(deps.as_ref(), 1).unwrap();
+        assert_eq!(b, (1, tea).into());
     }
 
-    // create the second badge
+    // create the second tea
     {
-        let badge = Badge {
+        let tea = Tea {
             manager: Addr::unchecked("jake"),
             metadata: Metadata {
-                name: Some("second-badge".to_string()),
+                name: Some("second-tea".to_string()),
                 ..Default::default()
             },
             transferrable: false,
@@ -148,35 +148,35 @@ fn creating_badge() {
             current_supply: 0,
         };
 
-        let res = create_badge(deps.as_mut(), &badge);
+        let res = create_tea(deps.as_mut(), &tea);
         assert_eq!(res.messages, vec![]);
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/create_badge"),
+                attr("action", "tea/hub/create_tea"),
                 attr("id", "2"),
                 attr("fee", "[]"),
             ]
         );
 
         let cfg = query::config(deps.as_ref()).unwrap();
-        assert_eq!(cfg.badge_count, 2);
+        assert_eq!(cfg.tea_count, 2);
 
-        let b = query::badge(deps.as_ref(), 2).unwrap();
-        assert_eq!(b, (2, badge).into());
+        let b = query::tea(deps.as_ref(), 2).unwrap();
+        assert_eq!(b, (2, tea).into());
     }
 }
 
 #[test]
-fn editing_badge() {
+fn editing_tea() {
     let mut deps = setup_test();
 
-    let badge = mock_badge();
-    create_badge(deps.as_mut(), &badge);
+    let tea = mock_tea();
+    create_tea(deps.as_mut(), &tea);
 
     // non-manager cannot edit
     {
-        let err = execute::edit_badge(
+        let err = execute::edit_tea(
             deps.as_mut(),
             mock_info("jake", &[]),
             1,
@@ -188,9 +188,9 @@ fn editing_badge() {
 
     // manager can edit
     {
-        let res = execute::edit_badge(
+        let res = execute::edit_tea(
             deps.as_mut(),
-            mock_info(badge.manager.as_str(), &[]),
+            mock_info(tea.manager.as_str(), &[]),
             1,
             Metadata::default(),
         )
@@ -199,13 +199,13 @@ fn editing_badge() {
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/edit_badge"),
+                attr("action", "tea/hub/edit_tea"),
                 attr("id", "1"),
                 attr("fee", "[]"),
             ],
         );
 
-        let b = query::badge(deps.as_ref(), 1).unwrap();
+        let b = query::tea(deps.as_ref(), 1).unwrap();
         assert_eq!(b.metadata, Metadata::default());
     }
 }
@@ -214,13 +214,13 @@ fn editing_badge() {
 fn adding_keys() {
     let mut deps = setup_test();
 
-    // badge 1 has mint rule "by keys"
-    let mut badge = mock_badge();
-    create_badge(deps.as_mut(), &badge);
+    // tea 1 has mint rule "by keys"
+    let mut tea = mock_tea();
+    create_tea(deps.as_mut(), &tea);
 
-    // badge 2 has mint rule "by minter"
-    badge.rule = MintRule::ByMinter("pumpkin".to_string());
-    create_badge(deps.as_mut(), &badge);
+    // tea 2 has mint rule "by minter"
+    tea.rule = MintRule::ByMinter("pumpkin".to_string());
+    create_tea(deps.as_mut(), &tea);
 
     // non-manager cannot add key
     {
@@ -235,7 +235,7 @@ fn adding_keys() {
         assert_eq!(err, ContractError::NotManager);
     }
 
-    // cannot add key if the badge is not of "by keys" mint rule
+    // cannot add key if the tea is not of "by keys" mint rule
     {
         let err = execute::add_keys(
             deps.as_mut(),
@@ -245,10 +245,10 @@ fn adding_keys() {
             utils::btreeset(&[KEY_1]),
         )
         .unwrap_err();
-        assert_eq!(err, ContractError::wrong_mint_rule("by_keys", &badge.rule));
+        assert_eq!(err, ContractError::wrong_mint_rule("by_keys", &tea.rule));
     }
 
-    // cannot add key if the badge is no longer available
+    // cannot add key if the tea is no longer available
     {
         let err = execute::add_keys(
             deps.as_mut(),
@@ -294,7 +294,7 @@ fn adding_keys() {
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/add_keys"),
+                attr("action", "tea/hub/add_keys"),
                 attr("id", "1"),
                 attr("fee", "[]"),
                 attr("keys_added", "2"),
@@ -310,13 +310,13 @@ fn adding_keys() {
 fn rejecting_invalid_keys() {
     let mut deps = setup_test();
 
-    // cannot create a new badge with invalid key
+    // cannot create a new tea with invalid key
     {
-        let err = execute::create_badge(
+        let err = execute::create_tea(
             deps.as_mut(),
             mock_env(),
             mock_info("larry", &[]),
-            Badge {
+            Tea {
                 manager: Addr::unchecked("larry"),
                 metadata: Metadata::default(),
                 transferrable: false,
@@ -330,14 +330,14 @@ fn rejecting_invalid_keys() {
         assert_eq!(err, ContractError::InvalidPubkey);
     }
 
-    // cannot add invalid keys to an existing badge
+    // cannot add invalid keys to an existing tea
     {
-        // first, properly create a badge with the "by keys" minting rule
-        execute::create_badge(
+        // first, properly create a tea with the "by keys" minting rule
+        execute::create_tea(
             deps.as_mut(),
             mock_env(),
             mock_info("larry", &[]),
-            Badge {
+            Tea {
                 manager: Addr::unchecked("larry"),
                 metadata: Metadata::default(),
                 transferrable: false,

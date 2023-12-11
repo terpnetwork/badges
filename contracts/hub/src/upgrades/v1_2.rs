@@ -1,33 +1,33 @@
-use cosmwasm_std::{DepsMut, StdResult, Storage};
+use cosmwasm_std::{DepsMut, StdResult};
 use terp_sdk::Response;
 
-use badges::MintRule;
+// use tea::MintRule;
 
 use crate::{
     contract::{CONTRACT_NAME, CONTRACT_VERSION},
-    state::BADGES,
+    // state::ALL_TEA,
 };
 
-const NEW_BADGE_17_KEY: &str = "036986114808be5b9f9009754014bdf5ae210cc17c93f4e1d010164be74b8653f4";
+// const NEW_TEA_17_KEY: &str = "036986114808be5b9f9009754014bdf5ae210cc17c93f4e1d010164be74b8653f4";
 
 pub fn migrate(deps: DepsMut) -> StdResult<Response> {
-    // correct the claim key of badge 17
-    update_badge_17_key(deps.storage)?;
+    // correct the claim key of tea 17
+    // update_tea_17_key(deps.storage)?;
 
     // set the contract version to v1.2.0
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     Ok(Response::new()
-        .add_attribute("action", "badges/hub/migrate")
-        .add_attribute("from_version", "1.1.0")
-        .add_attribute("to_version", "1.2.0"))
+        .add_attribute("action", "tea/hub/migrate"))
+        // .add_attribute("from_version", "1.1.0")
+        // .add_attribute("to_version", "1.2.0"))
 }
 
-fn update_badge_17_key(store: &mut dyn Storage) -> StdResult<()> {
-    BADGES.update(store, 17, |opt| -> StdResult<_> {
-        let mut badge = opt.unwrap();
-        badge.rule = MintRule::ByKey(NEW_BADGE_17_KEY.into());
-        Ok(badge)
-    })?;
-    Ok(())
-}
+// fn update_tea_17_key(store: &mut dyn Storage) -> StdResult<()> {
+//     ALL_TEA.update(store, 17, |opt| -> StdResult<_> {
+//         let mut tea = opt.unwrap();
+//         tea.rule = MintRule::ByKey(NEW_TEA_17_KEY.into());
+//         Ok(tea)
+//     })?;
+//     Ok(())
+// }

@@ -11,12 +11,12 @@ helpers.suppressFetchAPIWarning();
 const args = yargs(hideBin(process.argv))
   .option("hub-code-id", {
     type: "number",
-    describe: "code id of the badges hub contract",
+    describe: "code id of the tea hub contract",
     demandOption: true,
   })
   .option("nft-code-id", {
     type: "number",
-    describe: "code if of the badges nft contract",
+    describe: "code if of the tea nft contract",
     demandOption: true,
   })
   .option("network", {
@@ -52,7 +52,7 @@ const args = yargs(hideBin(process.argv))
     {
       fee_per_byte: "200000", // 0.2 STARS per byte
     },
-    "badge-hub",
+    "tea-hub",
     "auto",
     {
       admin: senderAddr,
@@ -66,19 +66,19 @@ const args = yargs(hideBin(process.argv))
     args["nft-code-id"],
     {
       hub: hubAddr,
-      api_url: "https://api.badges.fun/metadata",
+      api_url: "https://api.tea.fun/metadata",
       collection_info: {
         creator: senderAddr,
-        description: "Badges is an NFT protocol that allows anyone to create digital badges",
-        image: "https://badges.fun/logo.png",
-        external_link: "https://badges.fun",
-        royalty_info: {
+        description: "TEA is an NFT protocol that allows anyone to create digital tea",
+        image: "https://tea.fun/logo.png",
+        external_link: "https://tea.fun",
+        residual_info: {
           payment_address: senderAddr,
           share: "0.05",
         },
       },
     },
-    "badge-nft",
+    "tea-nft",
     "auto",
     {
       admin: senderAddr,

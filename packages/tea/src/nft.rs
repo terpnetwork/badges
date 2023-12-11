@@ -7,9 +7,9 @@ pub type Extension = Option<Empty>;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct InstantiateMsg {
-    /// Address of the Badges Hub contract
+    /// Address of the Tea Hub contract
     pub hub: String,
-    /// URL of an API that serves the Badges metadata.
+    /// URL of an API that serves the Tea's metadata.
     /// The full URL will be `${api_url}?id=${id}&serial=${serial}`
     pub api_url: String,
     /// SG-721 collection info

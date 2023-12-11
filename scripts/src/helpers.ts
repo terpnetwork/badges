@@ -44,7 +44,7 @@ export async function createSigningClient(network: string, wallet: DirectSecp256
 
   process.stdout.write("creating signing client... ");
   const client = await SigningCosmWasmClient.connectWithSigner(rpcUrl, wallet, {
-    gasPrice: GasPrice.fromString("0ustars"),
+    gasPrice: GasPrice.fromString("0uthiol"),
   });
   console.log("success!");
 

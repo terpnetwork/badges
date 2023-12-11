@@ -1,7 +1,7 @@
 use std::any::type_name;
 use std::marker::PhantomData;
 
-use badge_nft::entry;
+use tea_nft::entry;
 use cosmwasm_std::testing::{mock_env, mock_info, MockApi, MockStorage};
 use cosmwasm_std::{Addr, Empty, OwnedDeps, StdError};
 use cw721::{AllNftInfoResponse, Cw721Query};
@@ -9,9 +9,9 @@ use cw721::{AllNftInfoResponse, Cw721Query};
 use terp721::CollectionInfo;
 use terp_metadata::{Metadata, Trait};
 
-use badge_nft::contract::{parse_token_id, prepend_traits, NftContract};
-use badges::nft::{ExecuteMsg, Extension, InstantiateMsg};
-use badges::{Badge, MintRule};
+use tea_nft::contract::{parse_token_id, prepend_traits, NftContract};
+use tea::nft::{ExecuteMsg, InstantiateMsg};
+use tea::{Tea, MintRule};
 
 mod mock_querier;
 
@@ -19,7 +19,7 @@ fn mock_metadata() -> Metadata {
     Metadata {
         image: Some("ipfs://hash".to_string()),
         description: Some("This is a test".to_string()),
-        name: Some("Test Badge".to_string()),
+        name: Some("Test Tea".to_string()),
         attributes: Some(vec![Trait {
             display_type: None,
             trait_type: "rarity".to_string(),
@@ -37,9 +37,9 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
         custom_query_type: PhantomData,
     };
 
-    deps.querier.hub.set_badge(
+    deps.querier.hub.set_tea(
         69,
-        Badge {
+        Tea {
             manager: Addr::unchecked("larry"),
             metadata: mock_metadata(),
             transferrable: true,
@@ -50,9 +50,9 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
         },
     );
 
-    deps.querier.hub.set_badge(
+    deps.querier.hub.set_tea(
         420,
-        Badge {
+        Tea {
             manager: Addr::unchecked("jake"),
             metadata: mock_metadata(),
             transferrable: false,
@@ -68,16 +68,16 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
     // sg721 requires that the deployer must be a contract:
     // https://github.com/public-awesome/launchpad/blob/v0.21.1/contracts/sg721-base/src/contract.rs#L39-L47
     //
-    // to pass the test, we use a custom wasm query handler that returns "badge_hub"
-    // as a valid contract, and make sure to use "badge_hub" here as the sender.
+    // to pass the test, we use a custom wasm query handler that returns "tea_hub"
+    // as a valid contract, and make sure to use "tea_hub" here as the sender.
     contract
         .instantiate(
             deps.as_mut(),
             mock_env(),
-            mock_info("badge_hub", &[]),
+            mock_info("tea_hub", &[]),
             InstantiateMsg {
                 hub: "hub".to_string(),
-                api_url: "https://badges-api.larry.engineer/metadata".to_string(),
+                api_url: "https://tea-api.larry.engineer/metadata".to_string(),
                 collection_info: CollectionInfo {
                     creator: "larry".to_string(),
                     description: "this is a test".to_string(),
@@ -183,7 +183,7 @@ fn instantiating() {
     assert_eq!(minter.minter, Some("hub".to_string()));
 
     let info = contract.parent.parent.contract_info(deps.as_ref()).unwrap();
-    assert_eq!(info.name, "Badges");
+    assert_eq!(info.name, "Terp Event Attendance Token");
     assert_eq!(info.symbol, "B");
 
     let info = contract.parent.query_collection_info(deps.as_ref()).unwrap();
@@ -234,7 +234,7 @@ fn rejecting_transfers() {
     .unwrap_err();
     // sg721_base::ContractError does not implement Eq or PartialEq, so we can't directly compare
     // the error types here
-    assert_eq!(err.to_string(), "Generic error: badge 420 is not transferrable");
+    assert_eq!(err.to_string(), "Generic error: tea 420 is not transferrable");
 }
 
 #[test]
@@ -243,7 +243,7 @@ fn querying_nft_info() {
     let contract = NftContract::default();
 
     let info = contract.nft_info(deps.as_ref(), "69|420").unwrap();
-    assert_eq!(info.token_uri.unwrap(), "https://badges-api.larry.engineer/metadata?id=69&serial=420");
+    assert_eq!(info.token_uri.unwrap(), "https://tea-api.larry.engineer/metadata?id=69&serial=420");
     assert_eq!(info.extension, prepend_traits(mock_metadata(), 69, 420));
 }
 
@@ -257,6 +257,6 @@ fn querying_all_nft_info() {
         info,
     } = contract.all_nft_info(deps.as_ref(), mock_env(), "69|420".to_string(), None).unwrap();
     assert_eq!(access.owner, "jake");
-    assert_eq!(info.token_uri.unwrap(), "https://badges-api.larry.engineer/metadata?id=69&serial=420");
+    assert_eq!(info.token_uri.unwrap(), "https://tea-api.larry.engineer/metadata?id=69&serial=420");
     assert_eq!(info.extension, prepend_traits(mock_metadata(), 69, 420));
 }

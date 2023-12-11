@@ -9,7 +9,7 @@ pub mod entry {
         entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, StdResult,
     };
     use terp721_base::ContractError;
-    use badges::nft::{ExecuteMsg, InstantiateMsg, QueryMsg};
+    use tea::nft::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
     use crate::contract::NftContract;
 
@@ -32,7 +32,7 @@ pub mod entry {
         msg: ExecuteMsg,
     ) -> Result<Response, ContractError> {
         let tract = NftContract::default();
-        // Transfers and approvals are only allowed if the badge is transferrable
+        // Transfers and approvals are only allowed if the tea is transferrable
         match &msg {
             ExecuteMsg::TransferNft {
                 token_id,

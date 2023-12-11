@@ -5,7 +5,7 @@ use cosmwasm_std::{to_json_binary, Addr, DepsMut, Empty, Env, MessageInfo, StdRe
 use terp_metadata::Metadata;
 use terp_sdk::Response;
 
-use badges::{Badge, FeeRate, MintRule};
+use tea::{Tea, FeeRate, MintRule};
 
 use crate::{
     error::ContractError,
@@ -17,11 +17,11 @@ use crate::{
 
 pub fn init(deps: DepsMut, developer: Addr, fee_rate: FeeRate) -> StdResult<Response> {
     DEVELOPER.save(deps.storage, &developer)?;
-    BADGE_COUNT.save(deps.storage, &0)?;
+    TEA_COUNT.save(deps.storage, &0)?;
     FEE_RATE.save(deps.storage, &fee_rate)?;
 
     Ok(Response::new()
-        .add_attribute("action", "badges/hub/init"))
+        .add_attribute("action", "tea/hub/init"))
 }
 
 pub fn set_nft(deps: DepsMut, sender_addr: Addr, nft: &str) -> Result<Response, ContractError> {
@@ -40,7 +40,7 @@ pub fn set_nft(deps: DepsMut, sender_addr: Addr, nft: &str) -> Result<Response, 
     NFT.save(deps.storage, &nft_addr)?;
 
     Ok(Response::new()
-        .add_attribute("action", "badges/hub/set_nft")
+        .add_attribute("action", "tea/hub/set_nft")
         .add_attribute("nft", nft))
 }
 
@@ -48,19 +48,19 @@ pub fn set_fee_rate(deps: DepsMut, fee_rate: FeeRate) -> StdResult<Response> {
     FEE_RATE.save(deps.storage, &fee_rate)?;
 
     Ok(Response::new()
-        .add_attribute("action", "badges/hub/set_fee_rate")
+        .add_attribute("action", "tea/hub/set_fee_rate")
         .add_attribute("metadata_fee_rate", fee_rate.metadata.to_string())
         .add_attribute("key_fee_rate", fee_rate.key.to_string()))
 }
 
-pub fn create_badge(
+pub fn create_tea(
     deps: DepsMut,
     env: Env,
     info: MessageInfo,
-    badge: Badge,
+    tea: Tea,
 ) -> Result<Response, ContractError> {
-    // the badge must not have already expired or have a max supply of zero
-    assert_available(&badge, &env.block, 1)?;
+    // the tea must not have already expired or have a max supply of zero
+    assert_available(&tea, &env.block, 1)?;
 
     // ensure the creator has paid a sufficient fee
     let fee_rate = FEE_RATE.load(deps.storage)?;
@@ -68,35 +68,35 @@ pub fn create_badge(
         deps.as_ref().storage,
         &info,
         None,
-        Some(&badge),
+        Some(&tea),
         fee_rate.metadata,
     )?;
 
-    // if the badge uses "by key" mint rule, the key must be a valid secp256k1
+    // if the tea uses "by key" mint rule, the key must be a valid secp256k1
     // public key
-    if let MintRule::ByKey(key) = &badge.rule {
+    if let MintRule::ByKey(key) = &tea.rule {
         let bytes = hex::decode(key)?;
         assert_valid_secp256k1_pubkey(&bytes)?;
     }
 
-    let id = BADGE_COUNT.update(deps.storage, |id| StdResult::Ok(id + 1))?;
-    BADGES.save(deps.storage, id, &badge)?;
+    let id = TEA_COUNT.update(deps.storage, |id| StdResult::Ok(id + 1))?;
+    ALL_TEA.save(deps.storage, id, &tea)?;
 
     Ok(res
-        .add_attribute("action", "badges/hub/create_badge")
+        .add_attribute("action", "tea/hub/create_tea")
         .add_attribute("id", id.to_string())
         .add_attribute("fee", stringify_funds(&info.funds)))
 }
 
-pub fn edit_badge(
+pub fn edit_tea(
     deps: DepsMut,
     info: MessageInfo,
     id: u64,
     metadata: Metadata,
 ) -> Result<Response, ContractError> {
-    let mut badge = BADGES.load(deps.storage, id)?;
+    let mut tea = ALL_TEA.load(deps.storage, id)?;
 
-    if info.sender != badge.manager {
+    if info.sender != tea.manager {
         return Err(ContractError::NotManager);
     }
 
@@ -105,16 +105,16 @@ pub fn edit_badge(
     let res = handle_fee(
         deps.as_ref().storage,
         &info,
-        Some(&badge.metadata),
+        Some(&tea.metadata),
         &metadata,
         fee_rate.metadata,
     )?;
 
-    badge.metadata = metadata;
-    BADGES.save(deps.storage, id, &badge)?;
+    tea.metadata = metadata;
+    ALL_TEA.save(deps.storage, id, &tea)?;
 
     Ok(res
-        .add_attribute("action", "badges/hub/edit_badge")
+        .add_attribute("action", "tea/hub/edit_tea")
         .add_attribute("id", id.to_string())
         .add_attribute("fee", stringify_funds(&info.funds)))
 }
@@ -126,15 +126,15 @@ pub fn add_keys(
     id: u64,
     keys: BTreeSet<String>,
 ) -> Result<Response, ContractError> {
-    let badge = BADGES.load(deps.storage, id)?;
+    let tea = ALL_TEA.load(deps.storage, id)?;
 
-    // only the badge's manager can add keys
-    if info.sender != badge.manager {
+    // only the tea's manager can add keys
+    if info.sender != tea.manager {
         return Err(ContractError::NotManager);
     }
 
-    // the badge must be of "by keys" minting rule
-    match &badge.rule {
+    // the tea must be of "by keys" minting rule
+    match &tea.rule {
         MintRule::ByKeys => (),
         rule => return Err(ContractError::wrong_mint_rule("by_keys", rule)),
     }
@@ -151,7 +151,7 @@ pub fn add_keys(
 
     // the minting deadline must not have been reached
     // the max supply must not have been reached
-    assert_available(&badge, &env.block, 1)?;
+    assert_available(&tea, &env.block, 1)?;
 
     // save the keys
     keys.iter().try_for_each(|key| -> Result<_, ContractError> {
@@ -170,7 +170,7 @@ pub fn add_keys(
     })?;
 
     Ok(res
-        .add_attribute("action", "badges/hub/add_keys")
+        .add_attribute("action", "tea/hub/add_keys")
         .add_attribute("id", id.to_string())
         .add_attribute("fee", stringify_funds(&info.funds))
         .add_attribute("keys_added", keys.len().to_string()))
@@ -182,10 +182,10 @@ pub fn purge_keys(
     id: u64,
     limit: Option<u32>,
 ) -> Result<Response, ContractError> {
-    let badge = BADGES.load(deps.storage, id)?;
+    let tea = ALL_TEA.load(deps.storage, id)?;
 
-    // can only purge keys once the badge becomes unavailable to be minted
-    assert_unavailable(&badge, &env.block)?;
+    // can only purge keys once the tea becomes unavailable to be minted
+    assert_unavailable(&tea, &env.block)?;
 
     // need to collect the keys into a Vec first before creating a new iterator to delete them
     // because of how Rust works
@@ -195,7 +195,7 @@ pub fn purge_keys(
     };
 
     Ok(Response::new()
-        .add_attribute("action", "badges/hub/purge_keys")
+        .add_attribute("action", "tea/hub/purge_keys")
         .add_attribute("id", id.to_string())
         .add_attribute("keys_purged", res.keys.len().to_string()))
 }
@@ -206,10 +206,10 @@ pub fn purge_owners(
     id: u64,
     limit: Option<u32>,
 ) -> Result<Response, ContractError> {
-    let badge = BADGES.load(deps.storage, id)?;
+    let tea = ALL_TEA.load(deps.storage, id)?;
 
-    // can only purge user data once the badge becomes unavailable to be minted
-    assert_unavailable(&badge, &env.block)?;
+    // can only purge user data once the tea becomes unavailable to be minted
+    assert_unavailable(&tea, &env.block)?;
 
     // need to collect the user addresses into a Vec first before creating a new iterator to delete
     // them because of how Rust works
@@ -219,7 +219,7 @@ pub fn purge_owners(
     };
 
     Ok(Response::new()
-        .add_attribute("action", "badges/hub/purge_owners")
+        .add_attribute("action", "tea/hub/purge_owners")
         .add_attribute("id", id.to_string())
         .add_attribute("owners_purged", res.owners.len().to_string()))
 }
@@ -232,16 +232,16 @@ pub fn mint_by_minter(
     sender: Addr,
 ) -> Result<Response, ContractError> {
     let nft_addr = NFT.load(deps.storage)?;
-    let mut badge = BADGES.load(deps.storage, id)?;
+    let mut tea = ALL_TEA.load(deps.storage, id)?;
 
     let amount = owners.len() as u64;
-    let start_serial = badge.current_supply + 1;
+    let start_serial = tea.current_supply + 1;
 
-    assert_available(&badge, &env.block, amount)?;
-    assert_can_mint_by_minter(&badge, &sender)?;
+    assert_available(&tea, &env.block, amount)?;
+    assert_can_mint_by_minter(&tea, &sender)?;
 
-    badge.current_supply += amount;
-    BADGES.save(deps.storage, id, &badge)?;
+    tea.current_supply += amount;
+    ALL_TEA.save(deps.storage, id, &tea)?;
 
     let msgs = owners
         .into_iter()
@@ -263,7 +263,7 @@ pub fn mint_by_minter(
 
     Ok(Response::new()
         .add_messages(msgs)
-        .add_attribute("action", "badges/hub/mint_by_minter")
+        .add_attribute("action", "tea/hub/mint_by_minter")
         .add_attribute("id", id.to_string())
         .add_attribute("amount", amount.to_string()))
 }
@@ -276,14 +276,14 @@ pub fn mint_by_key(
     signature: String,
 ) -> Result<Response, ContractError> {
     let nft_addr = NFT.load(deps.storage)?;
-    let mut badge = BADGES.load(deps.storage, id)?;
+    let mut tea = ALL_TEA.load(deps.storage, id)?;
 
-    assert_available(&badge, &env.block, 1)?;
+    assert_available(&tea, &env.block, 1)?;
     assert_eligible(deps.storage, id, &owner)?;
-    assert_can_mint_by_key(deps.api, id, &badge, &owner, &signature)?;
+    assert_can_mint_by_key(deps.api, id, &tea, &owner, &signature)?;
 
-    badge.current_supply += 1;
-    BADGES.save(deps.storage, id, &badge)?;
+    tea.current_supply += 1;
+    ALL_TEA.save(deps.storage, id, &tea)?;
 
     OWNERS.insert(deps.storage, (id, &owner))?;
 
@@ -291,7 +291,7 @@ pub fn mint_by_key(
         .add_message(WasmMsg::Execute {
             contract_addr: nft_addr.to_string(),
             msg: to_json_binary(&terp721::ExecuteMsg::<_, Empty>::Mint {
-                token_id: token_id(id, badge.current_supply),
+                token_id: token_id(id, tea.current_supply),
                 // NOTE: it's possible to avoid cloning and save a liiiittle bit of gas here, simply
                 // by moving this `add_message` after the one `add_attribute` that uses `owner`.
                 // however this makes the code uglier so i don't want to do it.
@@ -301,9 +301,9 @@ pub fn mint_by_key(
             })?,
             funds: vec![],
         })
-        .add_attribute("action", "badges/hub/mint_by_key")
+        .add_attribute("action", "tea/hub/mint_by_key")
         .add_attribute("id", id.to_string())
-        .add_attribute("serial", badge.current_supply.to_string())
+        .add_attribute("serial", tea.current_supply.to_string())
         .add_attribute("recipient", owner))
 }
 
@@ -316,14 +316,14 @@ pub fn mint_by_keys(
     signature: String,
 ) -> Result<Response, ContractError> {
     let nft_addr = NFT.load(deps.storage)?;
-    let mut badge = BADGES.load(deps.storage, id)?;
+    let mut tea = ALL_TEA.load(deps.storage, id)?;
 
-    assert_available(&badge, &env.block, 1)?;
+    assert_available(&tea, &env.block, 1)?;
     assert_eligible(deps.storage, id, &owner)?;
-    assert_can_mint_by_keys(deps.as_ref(), id, &badge, &owner, &pubkey, &signature)?;
+    assert_can_mint_by_keys(deps.as_ref(), id, &tea, &owner, &pubkey, &signature)?;
 
-    badge.current_supply += 1;
-    BADGES.save(deps.storage, id, &badge)?;
+    tea.current_supply += 1;
+    ALL_TEA.save(deps.storage, id, &tea)?;
 
     KEYS.remove(deps.storage, (id, &pubkey))?;
     OWNERS.insert(deps.storage, (id, &owner))?;
@@ -332,15 +332,15 @@ pub fn mint_by_keys(
         .add_message(WasmMsg::Execute {
             contract_addr: nft_addr.to_string(),
             msg: to_json_binary(&terp721::ExecuteMsg::<_, Empty>::Mint {
-                token_id: token_id(id, badge.current_supply),
+                token_id: token_id(id, tea.current_supply),
                 owner: owner.clone(),
                 token_uri: None,
                 extension: None::<Empty>,
             })?,
             funds: vec![],
         })
-        .add_attribute("action", "badges/hub/mint_by_keys")
+        .add_attribute("action", "tea/hub/mint_by_keys")
         .add_attribute("id", id.to_string())
-        .add_attribute("serial", badge.current_supply.to_string())
+        .add_attribute("serial", tea.current_supply.to_string())
         .add_attribute("recipient", owner))
 }

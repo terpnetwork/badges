@@ -1,6 +1,6 @@
 [package]
-name        = "badge-hub"
-description = "Badge Hub contract is where event organizers create, mint, or edit badges."
+name        = "tea-hub"
+description = "Tea Hub contract is where event organizers create, mint, or edit tea."
 version     = { workspace = true }
 authors     = { workspace = true }
 edition     = { workspace = true }
@@ -17,7 +17,7 @@ doctest    = false
 library = []
 
 [dependencies]
-badges          = { path = "../../packages/badges" }
+tea          = { path = "../../packages/tea" }
 cosmwasm-schema = { workspace = true }
 cosmwasm-std    = { workspace = true }
 cw-item-set     = { workspace = true }

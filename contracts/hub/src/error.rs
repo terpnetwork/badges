@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use badges::MintRule;
+use tea::MintRule;
 
 #[derive(Error, Debug, PartialEq)]
 pub enum ContractError {
@@ -34,33 +34,33 @@ pub enum ContractError {
     #[error("unauthorized: sender is not project developer")]
     NotDeveloper,
 
-    #[error("unauthorized: sender is not badge manager")]
+    #[error("unauthorized: sender is not tea manager")]
     NotManager,
 
-    #[error("unauthorized: sender is not badge minter")]
+    #[error("unauthorized: sender is not tea minter")]
     NotMinter,
 
-    #[error("expecting the badge to be unavailable but it is available")]
+    #[error("expecting the tea to be unavailable but it is available")]
     Available,
 
-    #[error("badge minting deadline has been been exceeded")]
+    #[error("tea minting deadline has been been exceeded")]
     Expired,
 
-    #[error("badge max supply has been been exceeded")]
+    #[error("tea max supply has been been exceeded")]
     SoldOut,
 
-    #[error("key {key} already exists for badge {id}")]
+    #[error("key {key} already exists for tea {id}")]
     KeyExists {
         id: u64,
         key: String,
     },
 
-    #[error("the provided key does not exist for badge {id}")]
+    #[error("the provided key does not exist for tea {id}")]
     KeyDoesNotExist {
         id: u64,
     },
 
-    #[error("user {user} has already claimed badge {id}")]
+    #[error("user {user} has already claimed tea {id}")]
     AlreadyClaimed {
         id: u64,
         user: String,
