@@ -2,20 +2,20 @@ use cosmwasm_std::testing::{mock_dependencies,  MockApi, MockQuerier, MockStorag
 use cosmwasm_std::{attr, Addr, Empty, OwnedDeps};
 use terp_metadata::Metadata;
 
-use badge_hub::error::ContractError;
-use badge_hub::state::*;
-use badge_hub::{execute, query};
-use badges::{Badge, MintRule};
+use tea_hub::error::ContractError;
+use tea_hub::state::*;
+use tea_hub::{execute, query};
+use tea::{Tea, MintRule};
 
 mod utils;
 
 fn setup_test() -> OwnedDeps<MockStorage, MockApi, MockQuerier, Empty> {
     let mut deps = mock_dependencies();
 
-    BADGES.save(
+    ALL_TEA.save(
         deps.as_mut().storage,
         1,
-        &Badge {
+        &Tea {
             manager: Addr::unchecked("larry"),
             metadata: Metadata::default(),
             transferrable: true,
@@ -40,7 +40,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, MockQuerier, Empty> {
 fn purging_keys() {
     let mut deps = setup_test();
 
-    // cannot purge when the badge is available
+    // cannot purge when the tea is available
     {
         let err = execute::purge_keys(
             deps.as_mut(),
@@ -52,7 +52,7 @@ fn purging_keys() {
         assert_eq!(err, ContractError::Available);
     }
 
-    // can purge once the badge becomes unavailable
+    // can purge once the tea becomes unavailable
     {
         let res = execute::purge_keys(
             deps.as_mut(),
@@ -65,7 +65,7 @@ fn purging_keys() {
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/purge_keys"),
+                attr("action", "tea/hub/purge_keys"),
                 attr("id", "1"),
                 attr("keys_purged", "2"),
             ],
@@ -88,7 +88,7 @@ fn purging_keys() {
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/purge_keys"),
+                attr("action", "tea/hub/purge_keys"),
                 attr("id", "1"),
                 attr("keys_purged", "0"), // no-op
             ],
@@ -100,7 +100,7 @@ fn purging_keys() {
 fn purging_owners() {
     let mut deps = setup_test();
 
-    // cannot purge when the badge is available
+    // cannot purge when the tea is available
     {
         let err = execute::purge_owners(
             deps.as_mut(),
@@ -112,7 +112,7 @@ fn purging_owners() {
         assert_eq!(err, ContractError::Available);
     }
 
-    // can purge once the badge becomes unavailable
+    // can purge once the tea becomes unavailable
     {
         let res = execute::purge_owners(
             deps.as_mut(),
@@ -125,7 +125,7 @@ fn purging_owners() {
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/purge_owners"),
+                attr("action", "tea/hub/purge_owners"),
                 attr("id", "1"),
                 attr("owners_purged", "2"),
             ],
@@ -148,7 +148,7 @@ fn purging_owners() {
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/purge_owners"),
+                attr("action", "tea/hub/purge_owners"),
                 attr("id", "1"),
                 attr("owners_purged", "0"), // no-op
             ],

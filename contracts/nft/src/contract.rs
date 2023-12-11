@@ -6,12 +6,12 @@ use cw721::Cw721Query;
 use terp_metadata::{Metadata, Trait};
 use terp_sdk::Response;
 
-use badges::hub::BadgeResponse;
-use badges::nft::{AllNftInfoResponse, Extension, InstantiateMsg, NftInfoResponse, MinterResponse};
+use tea::hub::TeaResponse;
+use tea::nft::{AllNftInfoResponse, Extension, InstantiateMsg, NftInfoResponse, MinterResponse};
 
 use crate::state::API_URL;
 
-pub const CONTRACT_NAME: &str = "crates.io:badge-hub";
+pub const CONTRACT_NAME: &str = "crates.io:tea-hub";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Default)]
@@ -36,7 +36,7 @@ impl<'a> NftContract<'a> {
             env,
             info,
             terp721::InstantiateMsg {
-                name: "Badges".to_string(),
+                name: "Terp Event Attendance Token".to_string(),
                 symbol: "B".to_string(),
                 minter: msg.hub,
                 collection_info: msg.collection_info,
@@ -44,14 +44,14 @@ impl<'a> NftContract<'a> {
         )
     }
 
-    /// Assert that the badge is transferrable
+    /// Assert that the tea is transferrable
     pub fn assert_transferrable(&self, deps: Deps, token_id: impl ToString) -> StdResult<()> {
         let (id, _) = parse_token_id(&token_id.to_string())?;
-        let badge = self.query_badge(deps, id)?;
-        if badge.transferrable {
+        let tea = self.query_tea(deps, id)?;
+        if tea.transferrable {
             Ok(())
         } else {
-            Err(StdError::generic_err(format!("badge {} is not transferrable", id)))
+            Err(StdError::generic_err(format!("tea {} is not transferrable", id)))
         }
     }
 
@@ -59,10 +59,10 @@ impl<'a> NftContract<'a> {
     pub fn nft_info(&self, deps: Deps, token_id: impl ToString) -> StdResult<NftInfoResponse> {
         let (id, serial) = parse_token_id(&token_id.to_string())?;
         let uri = uri(deps.storage, id, serial)?;
-        let badge = self.query_badge(deps, id)?;
+        let tea = self.query_tea(deps, id)?;
         Ok(NftInfoResponse {
             token_uri: Some(uri),
-            extension: prepend_traits(badge.metadata, id, serial),
+            extension: prepend_traits(tea.metadata, id, serial),
         })
     }
 
@@ -87,14 +87,14 @@ impl<'a> NftContract<'a> {
         })
     }
 
-    /// To save storage space, we save the badge's metadata at the Hub contract, instead of saving
+    /// To save storage space, we save the tea's metadata at the Hub contract, instead of saving
     /// a separate copy in each token's extension. This function queries the Hub contract for the
     /// metadata of a given token id.
-    fn query_badge(&self, deps: Deps, id: u64) -> StdResult<BadgeResponse> {
+    fn query_tea(&self, deps: Deps, id: u64) -> StdResult<TeaResponse> {
         let minter: MinterResponse = self.parent.parent.minter(deps)?;
         deps.querier.query_wasm_smart(
             &minter.minter.unwrap_or_default(),
-            &badges::hub::QueryMsg::Badge {
+            &tea::hub::QueryMsg::Tea {
                 id,
             },
         )
@@ -111,7 +111,7 @@ pub fn uri(store: &dyn Storage, id: u64, serial: u64) -> StdResult<String> {
     Ok(format!("{}?id={}&serial={}", api_url, id, serial))
 }
 
-/// Split a token id into badge id and serial number.
+/// Split a token id into tea id and serial number.
 /// The token id must be in the format `{u64}|{u64}`, where the 1st number is id and 2nd is serial.
 pub fn parse_token_id(token_id: &str) -> StdResult<(u64, u64)> {
     let split = token_id.split('|').collect::<Vec<&str>>();
@@ -129,7 +129,7 @@ pub fn parse_token_id(token_id: &str) -> StdResult<(u64, u64)> {
     Ok((id, serial))
 }
 
-/// The badge's id and serial are prepended to it's list of traits.
+/// The tea's id and serial are prepended to it's list of traits.
 pub fn prepend_traits(mut metadata: Metadata, id: u64, serial: u64) -> Metadata {
     let mut traits = vec![
         Trait {

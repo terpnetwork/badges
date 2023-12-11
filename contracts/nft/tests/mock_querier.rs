@@ -8,7 +8,7 @@ use cosmwasm_std::{
     QueryRequest, SystemError, WasmQuery,
 };
 
-use badges::{hub, Badge};
+use tea::{hub, Tea};
 
 pub struct CustomQuerier {
     pub base: MockQuerier<Empty>,
@@ -56,41 +56,41 @@ impl Querier for CustomQuerier {
 
 pub struct HubQuerier {
     contract_addr: Addr,
-    badges: HashMap<u64, Badge>,
+    tea: HashMap<u64, Tea>,
 }
 
 impl Default for HubQuerier {
     fn default() -> Self {
         HubQuerier {
             contract_addr: Addr::unchecked("hub"),
-            badges: HashMap::default(),
+            tea: HashMap::default(),
         }
     }
 }
 
 impl HubQuerier {
-    pub fn set_badge(&mut self, id: u64, badge: Badge) {
-        self.badges.insert(id, badge);
+    pub fn set_tea(&mut self, id: u64, tea: Tea) {
+        self.tea.insert(id, tea);
     }
 
     pub fn handle_query(&self, contract_addr: &Addr, msg: hub::QueryMsg) -> QuerierResult {
         if contract_addr != &self.contract_addr {
             panic!(
-                "[mock]: made a badge hub query but addresses is incorrect: expected {}, found {}",
+                "[mock]: made a tea hub query but addresses is incorrect: expected {}, found {}",
                 self.contract_addr, contract_addr
             );
         }
 
         match msg {
-            hub::QueryMsg::Badge {
+            hub::QueryMsg::Tea {
                 id,
             } => {
-                let badge = self
-                    .badges
+                let tea = self
+                    .tea
                     .get(&id)
                     .cloned()
-                    .unwrap_or_else(|| panic!("[mock]: cannot find badge with id {}", id));
-                let res = hub::BadgeResponse::from((id, badge));
+                    .unwrap_or_else(|| panic!("[mock]: cannot find tea with id {}", id));
+                let res = hub::TeaResponse::from((id, tea));
                 Ok(to_json_binary(&res).into()).into()
             },
 
@@ -102,13 +102,13 @@ impl HubQuerier {
 /// sg721 requires that the deployer must be a contract:
 /// https://github.com/public-awesome/launchpad/blob/v0.21.1/contracts/sg721-base/src/contract.rs#L39-L47
 ///
-/// to pass the test, we use a custom wasm query handler that returns "badge_hub"
-/// as a valid contract, and make sure to use "badge_hub" here as the sender.
+/// to pass the test, we use a custom wasm query handler that returns "tea_hub"
+/// as a valid contract, and make sure to use "tea_hub" here as the sender.
 fn wasm_querier_handler(query: &WasmQuery) -> QuerierResult {
     match query {
         WasmQuery::ContractInfo {
             contract_addr,
-        } if contract_addr == "badge_hub" => {
+        } if contract_addr == "tea_hub" => {
             Ok(to_json_binary(&ContractInfoResponse::new(69420, "larry")).into()).into()
         },
         _ => panic!("[mock]: unimplemented wasm query: {query:?}"),

@@ -1,8 +1,8 @@
 use cosmwasm_std::{Deps, Order, StdResult};
 use cw_storage_plus::Bound;
 
-use badges::hub::{
-    BadgeResponse, BadgesResponse, ConfigResponse, KeyResponse, KeysResponse, OwnerResponse,
+use tea::hub::{
+    TeaResponse, AllTeaResponse, ConfigResponse, KeyResponse, KeysResponse, OwnerResponse,
     OwnersResponse,
 };
 
@@ -14,40 +14,40 @@ pub const MAX_LIMIT: u32 = 30;
 pub fn config(deps: Deps) -> StdResult<ConfigResponse> {
     let developer_addr = DEVELOPER.load(deps.storage)?;
     let nft_addr = NFT.load(deps.storage)?;
-    let badge_count = BADGE_COUNT.load(deps.storage)?;
+    let tea_count = TEA_COUNT.load(deps.storage)?;
     let fee_rate = FEE_RATE.load(deps.storage)?;
     Ok(ConfigResponse {
         developer: developer_addr.into(),
         nft: nft_addr.into(),
-        badge_count,
+        tea_count,
         fee_rate,
     })
 }
 
-pub fn badge(deps: Deps, id: u64) -> StdResult<BadgeResponse> {
-    let badge = BADGES.load(deps.storage, id)?;
-    Ok((id, badge).into())
+pub fn tea(deps: Deps, id: u64) -> StdResult<TeaResponse> {
+    let tea = ALL_TEA.load(deps.storage, id)?;
+    Ok((id, tea).into())
 }
 
-pub fn badges(
+pub fn all_tea(
     deps: Deps,
     start_after: Option<u64>,
     limit: Option<u32>,
-) -> StdResult<BadgesResponse> {
+) -> StdResult<AllTeaResponse> {
     let start = start_after.map(Bound::exclusive);
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;
 
-    let badges = BADGES
+    let tea = ALL_TEA
         .range(deps.storage, start, None, Order::Ascending)
         .take(limit)
         .map(|item| {
-            let (id, badge) = item?;
-            Ok((id, badge).into())
+            let (id, tea) = item?;
+            Ok((id, tea).into())
         })
         .collect::<StdResult<Vec<_>>>()?;
 
-    Ok(BadgesResponse {
-        badges,
+    Ok(AllTeaResponse {
+        tea,
     })
 }
 

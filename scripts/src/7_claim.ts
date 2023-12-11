@@ -4,7 +4,7 @@ import * as secp256k1 from "secp256k1";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { contracts } from "@steak-enjoyers/badges.js";
+import { contracts } from "@steak-enjoyers/tea.js";
 
 import { sha256 } from "./hash";
 import * as helpers from "./helpers";
@@ -15,12 +15,12 @@ helpers.suppressFetchAPIWarning();
 const args = yargs(hideBin(process.argv))
   .option("hub-addr", {
     type: "string",
-    describe: "address of the badge hub contract",
+    describe: "address of the tea hub contract",
     demandOption: true,
   })
   .option("id", {
     type: "number",
-    describe: "badge id",
+    describe: "tea id",
     demandOption: true,
   })
   .option("privkey", {
@@ -35,7 +35,7 @@ const args = yargs(hideBin(process.argv))
   })
   .option("owner", {
     type: "string",
-    describe: "address to receive the badge",
+    describe: "address to receive the tea",
     demandOption: true,
   })
   .option("network", {
@@ -69,7 +69,7 @@ const args = yargs(hideBin(process.argv))
   const privKey = Buffer.from(args["privkey"], "hex");
   const pubKey = Buffer.from(secp256k1.publicKeyCreate(privKey, true));
 
-  const message = `claim badge ${args["id"]} for user ${args["owner"]}`;
+  const message = `claim tea ${args["id"]} for user ${args["owner"]}`;
   const msgBytes = Buffer.from(message, "utf8");
   const msgHashBytes = sha256(msgBytes);
   const { signature } = secp256k1.ecdsaSign(msgHashBytes, privKey);
@@ -98,7 +98,7 @@ const args = yargs(hideBin(process.argv))
     }
   })();
 
-  await promptly.confirm("proceed to mint the badge? [y/N] ");
+  await promptly.confirm("proceed to mint the tea? [y/N] ");
 
   console.log("broadcasting tx...");
   const { transactionHash } = await promise;

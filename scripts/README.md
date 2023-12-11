@@ -1,6 +1,6 @@
-# badges-scripts
+# tea-scripts
 
-NodeJS scripts for interacting with Badges contracts
+NodeJS scripts for interacting with Tea contracts
 
 ## License
 

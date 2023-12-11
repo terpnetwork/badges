@@ -6,10 +6,13 @@ members = [
 
 [workspace.package]
 version    = "0.1.0"
-authors    = ["A Hardnett <returniflost@skiff.com>"]
+authors    = [
+    "A Hardnett <returniflost@skiff.com>",
+    "larry <gm@larry.engineer>",
+    ]
 edition    = "2021"
-homepage   = "https://dash.terp.network/w/badges"
-repository = "https://github.com/terpnetwork/badges"
+homepage   = "https://dash.terp.network/w/tea"
+repository = "https://github.com/terpnetwork/tea"
 license    = "GPL-3.0-or-later"
 keywords   = ["nft", "cosmos", "cosmwasm", "terpnetwork"]
 

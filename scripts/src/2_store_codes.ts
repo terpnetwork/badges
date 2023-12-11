@@ -12,15 +12,15 @@ helpers.suppressFetchAPIWarning();
 const args = yargs(hideBin(process.argv))
   .option("hub-wasm", {
     type: "string",
-    describe: "path to the Badge Hub contract binary",
+    describe: "path to the Tea Hub contract binary",
     demandOption: false,
-    default: path.resolve(__dirname, "../artifacts/badge_hub.wasm"),
+    default: path.resolve(__dirname, "../artifacts/tea_hub.wasm"),
   })
   .option("nft-wasm", {
     type: "string",
-    describe: "path to the Badge NFT contract binary",
+    describe: "path to the Tea NFT contract binary",
     demandOption: false,
-    default: path.resolve(__dirname, "../artifacts/badge_nft.wasm"),
+    default: path.resolve(__dirname, "../artifacts/tea_nft.wasm"),
   })
   .option("network", {
     type: "string",

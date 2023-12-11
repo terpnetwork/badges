@@ -2,7 +2,7 @@
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "^0.28.13",
     "@cosmjs/proto-signing": "^0.28.13",
-    "@steak-enjoyers/badges.js": "^1.0.0-rc2",
+    "@steak-enjoyers/tea.js": "^1.0.0-rc2",
     "canvas": "^2.10.1",
     "jscrypto": "^1.0.3",
     "promptly": "^3.2.0",

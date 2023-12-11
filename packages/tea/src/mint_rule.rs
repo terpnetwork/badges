@@ -6,16 +6,16 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum MintRule {
-    /// Badges can be minted by a designated minter account.
+    /// Tea's can be minted by a designated minter account.
     ///
     /// The minter can either be a human doing the minting manually, or a smart contract that
     /// implements custom minting rules.
     ByMinter(String),
 
-    /// Badges can be minted upon the the signature signed by a designated private key. Provide the
+    /// Tea's can be minted upon the the signature signed by a designated private key. Provide the
     /// associated public key in hex encoding.
     ///
-    /// This key can be reused as many time as possible for minting, as long as the badge's deadline
+    /// This key can be reused as many time as possible for minting, as long as the tea's deadline
     /// and max supply have not been reached.
     ByKey(String),
 

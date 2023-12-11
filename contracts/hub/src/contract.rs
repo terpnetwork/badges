@@ -3,14 +3,14 @@ use cosmwasm_std::{
 };
 use terp_sdk::Response;
 
-use badges::{
+use tea::{
     hub::{ExecuteMsg, InstantiateMsg, QueryMsg, SudoMsg},
-    Badge,
+    Tea,
 };
 
 use crate::{error::ContractError, execute, query, upgrades};
 
-pub const CONTRACT_NAME: &str = "crates.io:badge-hub";
+pub const CONTRACT_NAME: &str = "crates.io:tea-hub";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[entry_point]
@@ -41,7 +41,7 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::CreateBadge {
+        ExecuteMsg::CreateTea {
             manager,
             metadata,
             transferrable,
@@ -49,7 +49,7 @@ pub fn execute(
             expiry,
             max_supply,
         } => {
-            let badge = Badge {
+            let tea = Tea {
                 manager: deps.api.addr_validate(&manager)?,
                 metadata,
                 transferrable,
@@ -58,12 +58,12 @@ pub fn execute(
                 max_supply,
                 current_supply: 0,
             };
-            execute::create_badge(deps, env, info, badge)
+            execute::create_tea(deps, env, info, tea)
         },
-        ExecuteMsg::EditBadge {
+        ExecuteMsg::EditTea {
             id,
             metadata,
-        } => execute::edit_badge(deps, info, id, metadata),
+        } => execute::edit_tea(deps, info, id, metadata),
         ExecuteMsg::AddKeys {
             id,
             keys,
@@ -101,13 +101,13 @@ pub fn execute(
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::Config {} => to_json_binary(&query::config(deps)?),
-        QueryMsg::Badge {
+        QueryMsg::Tea {
             id,
-        } => to_json_binary(&query::badge(deps, id)?),
-        QueryMsg::Badges {
+        } => to_json_binary(&query::tea(deps, id)?),
+        QueryMsg::AllTea {
             start_after,
             limit,
-        } => to_json_binary(&query::badges(deps, start_after, limit)?),
+        } => to_json_binary(&query::all_tea(deps, start_after, limit)?),
         QueryMsg::Key {
             id,
             pubkey,

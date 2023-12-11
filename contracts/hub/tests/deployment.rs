@@ -1,11 +1,11 @@
-use cosmwasm_std::testing::{mock_dependencies};
+use cosmwasm_std::testing::mock_dependencies;
 use cosmwasm_std::{attr, Addr, Decimal};
 
-use badges::FeeRate;
+use tea::FeeRate;
 
-use badge_hub::error::ContractError;
-use badge_hub::state::{BADGE_COUNT, NFT, DEVELOPER};
-use badge_hub::execute;
+use tea_hub::error::ContractError;
+use tea_hub::state::{TEA_COUNT, NFT, DEVELOPER};
+use tea_hub::execute;
 
 #[test]
 fn instantiating() {
@@ -21,10 +21,10 @@ fn instantiating() {
     )
     .unwrap();
     assert_eq!(res.messages, vec![]);
-    assert_eq!(res.attributes, vec![attr("action", "badges/hub/init")]);
+    assert_eq!(res.attributes, vec![attr("action", "tea/hub/init")]);
 
-    let badge_count = BADGE_COUNT.load(deps.as_ref().storage).unwrap();
-    assert_eq!(badge_count, 0);
+    let tea_count = TEA_COUNT.load(deps.as_ref().storage).unwrap();
+    assert_eq!(tea_count, 0);
 }
 
 #[test]
@@ -49,7 +49,7 @@ fn setting_nft() {
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/set_nft"),
+                attr("action", "tea/hub/set_nft"),
                 attr("nft", "nft"),
             ],
         );

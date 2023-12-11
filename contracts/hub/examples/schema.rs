@@ -3,8 +3,8 @@ use std::fs::create_dir_all;
 
 use cosmwasm_schema::{export_schema, remove_schemas, schema_for};
 
-use badges::hub::{
-    BadgeResponse, BadgesResponse, ConfigResponse, ExecuteMsg, InstantiateMsg, KeyResponse,
+use tea::hub::{
+    TeaResponse, AllTeaResponse, ConfigResponse, ExecuteMsg, InstantiateMsg, KeyResponse,
     KeysResponse, OwnerResponse, OwnersResponse, QueryMsg,
 };
 
@@ -19,8 +19,8 @@ fn main() {
     export_schema(&schema_for!(QueryMsg), &out_dir);
 
     export_schema(&schema_for!(ConfigResponse), &out_dir);
-    export_schema(&schema_for!(BadgeResponse), &out_dir);
-    export_schema(&schema_for!(BadgesResponse), &out_dir);
+    export_schema(&schema_for!(TeaResponse), &out_dir);
+    export_schema(&schema_for!(AllTeaResponse), &out_dir);
     export_schema(&schema_for!(KeyResponse), &out_dir);
     export_schema(&schema_for!(KeysResponse), &out_dir);
     export_schema(&schema_for!(OwnerResponse), &out_dir);

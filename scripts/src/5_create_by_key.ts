@@ -5,7 +5,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
 import { coins } from "@cosmjs/proto-signing";
-import { contracts } from "@steak-enjoyers/badges.js";
+import { contracts } from "@steak-enjoyers/tea.js";
 
 import * as helpers from "./helpers";
 import * as keystore from "./keystore";
@@ -15,12 +15,12 @@ helpers.suppressFetchAPIWarning();
 const args = yargs(hideBin(process.argv))
   .option("hub-addr", {
     type: "string",
-    describe: "address of the badge hub contract",
+    describe: "address of the tea hub contract",
     demandOption: true,
   })
   .option("metadata", {
     type: "string",
-    describe: "path to a JSON file containing the badge's metadata",
+    describe: "path to a JSON file containing the tea's metadata",
     demandOption: true,
   })
   .option("pubkey", {
@@ -30,18 +30,18 @@ const args = yargs(hideBin(process.argv))
   })
   .option("transferrable", {
     type: "boolean",
-    describe: "whether the badge is transferrable",
+    describe: "whether the tea is transferrable",
     demandOption: false,
     default: true,
   })
   .option("expiry", {
     type: "number",
-    describe: "the deadline only before which this badge can be minted, in unix timestamp",
+    describe: "the deadline only before which this tea can be minted, in unix timestamp",
     demandOption: false,
   })
   .option("max-supply", {
     type: "number",
-    describe: "the maximum number of this badge that can be minted",
+    describe: "the maximum number of this tea that can be minted",
     demandOption: false,
   })
   .option("data-fee-amount", {
@@ -91,30 +91,30 @@ const args = yargs(hideBin(process.argv))
     expiry: args["expiry"],
     maxSupply: args["max-supply"],
   };
-  console.log("msg:", JSON.stringify({ create_badge: msg }, null, 2));
+  console.log("msg:", JSON.stringify({ create_tea: msg }, null, 2));
 
-  await promptly.confirm("proceed to create the badge? [y/N] ");
+  await promptly.confirm("proceed to create the tea? [y/N] ");
 
   console.log("broadcasting tx...");
-  const res = await hubClient.createBadge(
+  const res = await hubClient.createTea(
     // @ts-expect-error - ??
     msg,
     "auto",
     "",
-    args["data-fee-amount"] > 0 ? coins(args["data-fee-amount"], "ustars") : []
+    args["data-fee-amount"] > 0 ? coins(args["data-fee-amount"], "uthiol") : []
   );
   console.log(`success! txhash: ${res.transactionHash}`);
 
-  // parse tx result to find out the badge id
+  // parse tx result to find out the tea id
   const event = res.logs
     .map((log) => log.events)
     .flat()
     .find(
       (event) =>
         event.attributes.findIndex(
-          (attr) => attr.key === "action" && attr.value === "badges/hub/create_badge"
+          (attr) => attr.key === "action" && attr.value === "tea/hub/create_tea"
         ) > 0
     )!;
   const id = Number(event.attributes.find((attr) => attr.key === "id")!.value);
-  console.log("id of the badge created is:", id);
+  console.log("id of the tea created is:", id);
 })();

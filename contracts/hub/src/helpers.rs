@@ -3,7 +3,7 @@ use std::fmt;
 use cosmwasm_std::{Addr, Api, BlockInfo, Deps, Storage, Coin};
 use sha2::{Digest, Sha256};
 
-use badges::{Badge, MintRule};
+use tea::{Tea, MintRule};
 
 use crate::{
     error::ContractError,
@@ -15,14 +15,14 @@ const ECDSA_COMPRESSED_PUBKEY_LEN: usize = 33;
 /// Length of a serialized uncompressed public key
 const ECDSA_UNCOMPRESSED_PUBKEY_LEN: usize = 65;
 
-/// Each NFT's token id is simply the badge id and the serial separated by a pipe.
+/// Each NFT's token id is simply the tea id and the serial separated by a pipe.
 pub fn token_id(id: u64, serial: u64) -> String {
     format!("{}|{}", id, serial)
 }
 
-/// The message the user needs to sign to claim the badge under "by key" or "by keys" rule
+/// The message the user needs to sign to claim the tea under "by key" or "by keys" rule
 pub fn message(id: u64, user: impl fmt::Display) -> String {
-    format!("claim badge {} for user {}", id, user)
+    format!("claim tea {} for user {}", id, user)
 }
 
 /// The hash function to be used to sign a message before signing it. Here we use SHA256.
@@ -73,21 +73,21 @@ pub fn assert_valid_signature(
     }
 }
 
-// Assert the badge is available to be minted.
+// Assert the tea is available to be minted.
 // Throw an error if the mint deadline or the max supply has been reached.
 pub fn assert_available(
-    badge: &Badge,
+    tea: &Tea,
     block: &BlockInfo,
     amount: u64,
 ) -> Result<(), ContractError> {
-    if let Some(expiry) = badge.expiry {
+    if let Some(expiry) = tea.expiry {
         if block.time.seconds() > expiry {
             return Err(ContractError::Expired);
         }
     }
 
-    if let Some(max_supply) = badge.max_supply {
-        if badge.current_supply + amount > max_supply {
+    if let Some(max_supply) = tea.max_supply {
+        if tea.current_supply + amount > max_supply {
             return Err(ContractError::SoldOut);
         }
     }
@@ -95,15 +95,15 @@ pub fn assert_available(
     Ok(())
 }
 
-// Assert the badge it NOT available to be minted. Throw an error if it is available.
-pub fn assert_unavailable(badge: &Badge, block: &BlockInfo) -> Result<(), ContractError> {
-    match assert_available(badge, block, 1) {
+// Assert the tea it NOT available to be minted. Throw an error if it is available.
+pub fn assert_unavailable(tea: &Tea, block: &BlockInfo) -> Result<(), ContractError> {
+    match assert_available(tea, block, 1) {
         Ok(_) => Err(ContractError::Available),
         Err(_) => Ok(()),
     }
 }
 
-/// Assert that an account has not already minted a badge.
+/// Assert that an account has not already minted a tea.
 pub fn assert_eligible(store: &dyn Storage, id: u64, user: &str) -> Result<(), ContractError> {
     if !OWNERS.contains(store, (id, user)) {
         Ok(())
@@ -112,9 +112,9 @@ pub fn assert_eligible(store: &dyn Storage, id: u64, user: &str) -> Result<(), C
     }
 }
 
-/// Assert that a badge indeed uses the "by minter" rule, and that the sender is the minter.
-pub fn assert_can_mint_by_minter(badge: &Badge, sender: &Addr) -> Result<(), ContractError> {
-    match &badge.rule {
+/// Assert that a tea indeed uses the "by minter" rule, and that the sender is the minter.
+pub fn assert_can_mint_by_minter(tea: &Tea, sender: &Addr) -> Result<(), ContractError> {
+    match &tea.rule {
         MintRule::ByMinter(minter) => {
             if minter != sender {
                 Err(ContractError::NotMinter)
@@ -126,17 +126,17 @@ pub fn assert_can_mint_by_minter(badge: &Badge, sender: &Addr) -> Result<(), Con
     }
 }
 
-/// Assert that a badge indeed uses the "by key" rule, and the signature was produced by signing the
+/// Assert that a tea indeed uses the "by key" rule, and the signature was produced by signing the
 /// correct message with the correct privkey.
 pub fn assert_can_mint_by_key(
     api: &dyn Api,
     id: u64,
-    badge: &Badge,
+    tea: &Tea,
     owner: &str,
     signature: &str,
 ) -> Result<(), ContractError> {
-    // the badge must use the "by key" minting rule
-    let pubkey = match &badge.rule {
+    // the tea must use the "by key" minting rule
+    let pubkey = match &tea.rule {
         MintRule::ByKey(key) => key,
         rule => return Err(ContractError::wrong_mint_rule("by_key", rule)),
     };
@@ -148,18 +148,18 @@ pub fn assert_can_mint_by_key(
     Ok(())
 }
 
-/// Assert that a badge indeed uses the "by keys" rule, and that the signature was produced by
+/// Assert that a tea indeed uses the "by keys" rule, and that the signature was produced by
 /// signing the correct message using a whitelisted privkey.
 pub fn assert_can_mint_by_keys(
     deps: Deps,
     id: u64,
-    badge: &Badge,
+    tea: &Tea,
     owner: &str,
     pubkey: &str,
     signature: &str,
 ) -> Result<(), ContractError> {
-    // the badge must use the "by keys" minting rule
-    match &badge.rule {
+    // the tea must use the "by keys" minting rule
+    match &tea.rule {
         MintRule::ByKeys => (),
         rule => return Err(ContractError::wrong_mint_rule("by_keys", rule)),
     }

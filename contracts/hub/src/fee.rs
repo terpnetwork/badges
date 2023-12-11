@@ -20,7 +20,7 @@ pub fn handle_fee<T: serde::Serialize>(
     let new_bytes = to_json_binary(&new_data)?.len();
     let bytes_diff = new_bytes.saturating_sub(old_bytes);
 
-    // fee amount is bytes * fee rate (ustars per bytes)
+    // fee amount is bytes * fee rate (uthiol per bytes)
     let fee = Uint128::new(bytes_diff as u128) * fee_per_byte;
 
     let mut res = Response::new();

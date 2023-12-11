@@ -1,14 +1,14 @@
 use cosmwasm_std::testing::{mock_dependencies, MockApi, MockQuerier, MockStorage};
 use cosmwasm_std::{attr, to_json_binary, Addr, Empty, OwnedDeps, StdResult, Storage, SubMsg, WasmMsg};
 use k256::ecdsa::{SigningKey, VerifyingKey};
-use terp721_base::msg::ExecuteMsg::Mint;
+// use terp721_base::msg::ExecuteMsg::Mint;
 use terp_metadata::Metadata;
 
-use badge_hub::error::ContractError;
-use badge_hub::helpers::{message, token_id};
-use badge_hub::state::*;
-use badge_hub::{execute, query};
-use badges::{Badge, MintRule};
+use tea_hub::error::ContractError;
+use tea_hub::helpers::{message, token_id};
+use tea_hub::state::*;
+use tea_hub::{execute, query};
+use tea::{Tea, MintRule};
 
 mod utils;
 
@@ -20,12 +20,12 @@ fn mock_keys() -> (SigningKey, VerifyingKey, String) {
     (privkey, pubkey, pubkey_str)
 }
 
-fn set_badge_supply(store: &mut dyn Storage, id: u64, current_supply: u64) {
-    BADGES
-        .update(store, id, |badge| {
-            let mut badge = badge.unwrap();
-            badge.current_supply = current_supply;
-            StdResult::Ok(badge)
+fn set_tea_supply(store: &mut dyn Storage, id: u64, current_supply: u64) {
+    ALL_TEA
+        .update(store, id, |tea| {
+            let mut tea = tea.unwrap();
+            tea.current_supply = current_supply;
+            StdResult::Ok(tea)
         })
         .unwrap();
 }
@@ -35,7 +35,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, MockQuerier, Empty> {
 
     NFT.save(deps.as_mut().storage, &Addr::unchecked("nft")).unwrap();
 
-    let default_badge = Badge {
+    let default_tea = Tea {
         manager: Addr::unchecked("larry"),
         metadata: Metadata::default(),
         transferrable: true,
@@ -47,35 +47,35 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, MockQuerier, Empty> {
 
     let (_, _, pubkey_str) = mock_keys();
 
-    BADGES
+    ALL_TEA
         .save(
             deps.as_mut().storage,
             1,
-            &Badge {
+            &Tea {
                 rule: MintRule::ByMinter("larry".to_string()),
-                ..default_badge.clone()
+                ..default_tea.clone()
             },
         )
         .unwrap();
 
-    BADGES
+    ALL_TEA
         .save(
             deps.as_mut().storage,
             2,
-            &Badge {
+            &Tea {
                 rule: MintRule::ByKey(pubkey_str.clone()),
-                ..default_badge.clone()
+                ..default_tea.clone()
             },
         )
         .unwrap();
 
-    BADGES
+    ALL_TEA
         .save(
             deps.as_mut().storage,
             3,
-            &Badge {
+            &Tea {
                 rule: MintRule::ByKeys,
-                ..default_badge
+                ..default_tea
             },
         )
         .unwrap();
@@ -177,7 +177,7 @@ fn minting_by_minter() {
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/mint_by_minter"),
+                attr("action", "tea/hub/mint_by_minter"),
                 attr("id", "1"),
                 attr("amount", "2"),
             ],
@@ -265,7 +265,7 @@ fn minting_by_key() {
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/mint_by_key"),
+                attr("action", "tea/hub/mint_by_key"),
                 attr("id", "2"),
                 attr("serial", "99"),
                 attr("recipient", "larry"),
@@ -273,8 +273,8 @@ fn minting_by_key() {
         );
 
         // current supply should have been updated
-        let badge = BADGES.load(deps.as_ref().storage, 2).unwrap();
-        assert_eq!(badge.current_supply, 99);
+        let tea = ALL_TEA.load(deps.as_ref().storage, 2).unwrap();
+        assert_eq!(tea.current_supply, 99);
 
         // larry should be marked as already received
         let res = query::owner(deps.as_ref(), 2, "larry");
@@ -309,7 +309,7 @@ fn minting_by_key() {
 
     // attempt to mint after max supply is reached
     {
-        set_badge_supply(deps.as_mut().storage, 2, 100);
+        set_tea_supply(deps.as_mut().storage, 2, 100);
 
         let err = execute::mint_by_key(
             deps.as_mut(),
@@ -411,7 +411,7 @@ fn minting_by_keys() {
         assert_eq!(
             res.attributes,
             vec![
-                attr("action", "badges/hub/mint_by_keys"),
+                attr("action", "tea/hub/mint_by_keys"),
                 attr("id", "3"),
                 attr("serial", "99"),
                 attr("recipient", "larry"),
@@ -419,8 +419,8 @@ fn minting_by_keys() {
         );
 
         // current supply should have been updated
-        let badge = BADGES.load(deps.as_ref().storage, 3).unwrap();
-        assert_eq!(badge.current_supply, 99);
+        let tea = ALL_TEA.load(deps.as_ref().storage, 3).unwrap();
+        assert_eq!(tea.current_supply, 99);
 
         // larry should be marked as already received
         let res = query::owner(deps.as_ref(), 3, "larry");
@@ -479,7 +479,7 @@ fn minting_by_keys() {
 
     // attempt to mint after max supply is reached
     {
-        set_badge_supply(deps.as_mut().storage, 3, 100);
+        set_tea_supply(deps.as_mut().storage, 3, 100);
 
         let err = execute::mint_by_key(
             deps.as_mut(),
