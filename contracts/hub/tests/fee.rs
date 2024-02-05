@@ -37,28 +37,28 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, MockQuerier, Empty> {
 }
 
 fn assert_correct_terp_fee_output(res: &Response, fee_amount: u128) {
-    let dev_amount = fee_amount * 10 / 100;
-    let dist_amount = fee_amount - dev_amount ;
+    let dev_amount = fee_amount * 50 / 100;
+    let burn_amount = fee_amount * 50 / 100;
  
     assert_eq!(
         res.messages,
         vec![
+            SubMsg::new(BankMsg::Burn {
+                amount: coins(burn_amount, NATIVE_FEE_DENOM),
+            }),
             SubMsg::new(BankMsg::Send {
                 to_address: "larry".to_string(),
                 amount: coins(dev_amount, NATIVE_FEE_DENOM),
             }),
-            // SubMsg::new(BankMsg::Burn {
-            //     amount: coins(burn_amount, NATIVE_FEE_DENOM),
-            // }),
-            SubMsg::new(create_fund_community_pool_msg(coins(dist_amount, NATIVE_FEE_DENOM)))
+            // SubMsg::new(create_fund_community_pool_msg(coins(dist_amount, NATIVE_FEE_DENOM)))
         ]
     );
     assert_eq!(
         res.events,
         vec![Event::new("fair-burn")
+            .add_attribute("burn_amount", burn_amount.to_string())
             .add_attribute("dev", "larry")
-            .add_attribute("dev_amount", dev_amount.to_string())
-            .add_attribute("dist_amount", dist_amount.to_string())]
+            .add_attribute("dev_amount", dev_amount.to_string())]
     );
 }
 

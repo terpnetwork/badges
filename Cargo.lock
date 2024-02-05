@@ -1076,9 +1076,9 @@ dependencies = [
 
 [[package]]
 name = "terp-fee"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "750026670dc5ff00a15563adadad95186dd52a9a1a8d86b6182309b169215fe7"
+checksum = "9c39499ef4bb09f40c773e395362267b1d3a0ba440331c26b91a1e8472caa5e6"
 dependencies = [
  "cosmwasm-std",
  "cw-utils 1.0.3",

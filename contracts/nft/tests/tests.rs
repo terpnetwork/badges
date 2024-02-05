@@ -40,7 +40,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
     deps.querier.hub.set_tea(
         69,
         Tea {
-            manager: Addr::unchecked("larry"),
+            manager: Addr::unchecked("jake"),
             metadata: mock_metadata(),
             transferrable: true,
             rule: MintRule::ByKeys,
@@ -79,7 +79,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
                 hub: "hub".to_string(),
                 api_url: "https://tea-api.larry.engineer/metadata".to_string(),
                 collection_info: CollectionInfo {
-                    creator: "larry".to_string(),
+                    creator: "jake".to_string(),
                     description: "this is a test".to_string(),
                     image: "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string(),
                     external_link: Some("https://larry.engineer/".to_string()),
@@ -98,8 +98,8 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
             mock_env(),
             mock_info("hub", &[]),
             terp721_base::msg::NftParams::NftData {
-                token_id: "420|69".to_string(),
-                owner: "pumpkin".to_string(),
+                token_id: "69|420".to_string(),
+                owner: "jake".to_string(),
                 token_uri: None,
                 extension: None,
             },
@@ -113,8 +113,8 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, mock_querier::CustomQuerier, 
             mock_env(),
             mock_info("hub", &[]),
              terp721_base::msg::NftParams::NftData {
-                token_id: "420|69".to_string(),
-                owner: "pumpkin".to_string(),
+                token_id: "70|420".to_string(),
+                owner: "jake".to_string(),
                 token_uri: None,
                 extension: None,
             },
@@ -187,13 +187,13 @@ fn instantiating() {
     assert_eq!(info.symbol, "B");
 
     let info = contract.parent.query_collection_info(deps.as_ref()).unwrap();
-    assert_eq!(info.creator, "larry");
+    assert_eq!(info.creator, "jake");
     assert!(info.residual_info.is_none());
 
     let owner = contract
         .parent
         .parent
-        .owner_of(deps.as_ref(), mock_env(), "69|420".to_string(), false)
+        .owner_of(deps.as_ref(), mock_env(), "70|420".to_string(), false)
         .unwrap();
     assert_eq!(owner.owner, "jake");
 }
